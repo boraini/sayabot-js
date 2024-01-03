@@ -1,0 +1,11 @@
+import { verifyKey } from "discord-interactions";
+import env from "./env.json" assert { type: "json" };
+
+export function authenticate(headers, rawBody) {
+    const signature = headers['x-signature-ed25519'] ?? headers['X-Signature-Ed25519'];
+    const timestamp = headers['x-signature-timestamp'] ?? headers['X-Signature-Timestamp'];
+
+    const isValidRequest = verifyKey(rawBody, signature, timestamp, env.clientPublicKey);
+
+    return isValidRequest;
+}
