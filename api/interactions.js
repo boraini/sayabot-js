@@ -2,7 +2,7 @@ import { InteractionResponseType, InteractionType } from "discord-interactions";
 import { authenticate } from "../authentication.js";
 import { handleInteractionAsync } from "../handle-interaction.js";
 
-export async function handler(req, res) {
+export default async function handler(req, res) {
     if (!authenticate(req.headers, req.body)) {
         res.status(401);
         res.send("Unauthorized");
