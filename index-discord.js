@@ -1,4 +1,8 @@
-import { Client, REST } from "discord.js";
+import { Client, REST, GatewayIntentBits, Events, Routes } from "discord.js";
+import env from "./env.json" assert { type: "json" };
+import { connectDb } from "./database/mongodb.js";
+import { setCommands } from "./commands/commands.js";
+import { handleInteraction } from "./commands/commands.js";
 
 function getClient() {
     const client = new Client({

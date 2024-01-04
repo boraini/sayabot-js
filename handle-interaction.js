@@ -4,6 +4,7 @@ import { getJSONResponse } from "./globals.js";
 import env from "./env.json" assert { type: "json" };
 import { setCommands, handleInteraction } from "./commands/commands.js";
 import { ApplicationCommandType } from "discord.js";
+import { WebhookService } from "./webhooks/webhook-service.js";
 
 const commandClient = {};
 setCommands(commandClient);
@@ -14,10 +15,6 @@ function interactionResponseEditEndpoint(interaction) {
 
 function interactionResponseFollowupEndpoint(interaction) {
     return `${baseDiscordApiUrl}/webhooks/{application.id}/{interaction.token}`;
-}
-
-function createWebhookEndpoint(channel) {
-    return `${baseDiscordApiUrl}/channels/${channel.id}/webhooks`;
 }
 
 function getInteractionResponse(type, message, options) {
@@ -54,13 +51,6 @@ export async function handleInteractionAsync(interaction) {
             ...getJSONResponse(message, options),
             method: "POST",
         });
-    }
-
-    async function createWebhook(options) {
-        return fetch(createWebhookEndpoint(interaction.channel), {
-            ...getJSONResponse(options),
-            method: "POST",
-        }).then(r => r.json());
     }
 
     /* Other Functions */
@@ -101,8 +91,6 @@ export async function handleInteractionAsync(interaction) {
             myInteraction.targetMessage = Object.values(interaction.data.resolved.messages)[0];
             myInteraction.targetMessage.author.displayName = myInteraction.targetMessage.author.global_name;
         }
-
-        if (myInteraction.channel) myInteraction.channel.createWebhook = createWebhook;
 
         interaction.data.options?.forEach(({name, type, value}) => myInteraction.options.set(name, {name, type, value}));
 

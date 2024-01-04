@@ -6,7 +6,7 @@ export function getJSONResponse(object) {
     return {
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + env.discordToken,
+            "Authorization": "Bot " + env.discordToken,
         },
         body: JSON.stringify(object),
     };

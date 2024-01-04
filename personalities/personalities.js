@@ -1,17 +1,22 @@
 import joshua from "./joshua.js";
 import innkeeper from "./innkeeper.js";
 import serial_designation_n from "./serial_designation_n.js";
+import reverse from "./reverse.js";
 import { HuggingFaceConversation } from "../personality-helpers/huggingface.js";
 
 export const personalities = {
     joshua,
     innkeeper,
     serial_designation_n,
+    reverse,
 };
 
 export function hydrateConversation(conv) {
     let result = null;
     switch(conv.type) {
+        case "ReverseConversation":
+            result = reverse.Conversation.hydrate(conv);
+            break;
         case "HuggingFaceConversation":
         default:
             result = HuggingFaceConversation.hydrate(conv);

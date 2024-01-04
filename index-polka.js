@@ -1,6 +1,6 @@
 import polka from "polka";
 import bodyParser from "body-parser";
-import { handler } from "./index-aws.js";
+import { handler } from "./index.mjs";
 
 polka().use(bodyParser.text({
     type: ["application/json", "text/plain", "text/json"],

@@ -30,14 +30,14 @@ function findPersonality(query) {
 // PROBLEM: If the user starts a conversation and goes to DMs, the bot will crash because of interaction.channel
 async function sendResponse(interaction, conversation, response) {
     if (interaction.webhookClientPromise) {
-        // No need to await this.
-        interaction.editReply(conversation.lastMessage);
+        const editReplyPromise = interaction.editReply(conversation.lastMessage);
         const webhookClient = await interaction.webhookClientPromise;
         await webhookClient.send({
             content: response,
             avatarURL: conversation.webhookData.avatar,
             username: conversation.webhookData.displayName,
         });
+        await editReplyPromise;
     } else {
         await interaction.editReply(getMessageResponse(conversation, response));
     }

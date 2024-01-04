@@ -3,6 +3,7 @@
 env.json
 hardcoded-webhooks.js
 bin/
+*.zip
 
 # Logs
 logs
