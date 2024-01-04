@@ -34,6 +34,7 @@ export default async function handler(req, res) {
                 }
             }
             res.send(res.body);
+            break;
         default:
             res.send("");
     }
