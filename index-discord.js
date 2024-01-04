@@ -1,5 +1,5 @@
 import { Client, REST, GatewayIntentBits, Events, Routes } from "discord.js";
-import env from "./env.json" assert { type: "json" };
+import env from "./env.js";
 import { connectDb } from "./database/mongodb.js";
 import { setCommands } from "./commands/commands.js";
 import { handleInteraction } from "./commands/commands.js";

@@ -1,4 +1,4 @@
-import env from "../env.json" assert { type: "json" };
+import env from "../env.js";
 import { Db, MongoClient } from "mongodb";
 
 /** @type {MongoClient} */

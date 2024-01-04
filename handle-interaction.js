@@ -1,7 +1,7 @@
 import { InteractionResponseType, InteractionType } from "discord-interactions";
 import { baseDiscordApiUrl } from "./globals.js";
 import { getJSONResponse } from "./globals.js";
-import env from "./env.json" assert { type: "json" };
+import env from "./env.js";
 import { setCommands, handleInteraction } from "./commands/commands.js";
 import { ApplicationCommandType } from "discord.js";
 import { WebhookService } from "./webhooks/webhook-service.js";

@@ -1,5 +1,5 @@
 import { conversational } from "@huggingface/inference";
-import env from "../env.json" assert { type: "json" };
+import env from "../env.js";
 import { getMessageResponse, getErrorResponse } from "../personality-helpers/standard-response.js";
 
 const CONVERSATION_LENGTH_LIMIT = 3;

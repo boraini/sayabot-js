@@ -1,5 +1,5 @@
 import { verifyKey } from "discord-interactions";
-import env from "./env.json" assert { type: "json" };
+import env from "./env.js";
 
 export function authenticate(headers, rawBody) {
     const signature = headers['x-signature-ed25519'] ?? headers['X-Signature-Ed25519'];
