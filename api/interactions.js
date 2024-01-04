@@ -33,7 +33,7 @@ export default async function handler(req, res) {
                     res.setHeader(header, value);
                 }
             }
-            res.send(res.body);
+            res.send(response.body);
             break;
         default:
             res.send("");
