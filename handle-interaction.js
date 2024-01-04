@@ -14,7 +14,7 @@ function interactionResponseEditEndpoint(interaction) {
 }
 
 function interactionResponseFollowupEndpoint(interaction) {
-    return `${baseDiscordApiUrl}/webhooks/{application.id}/{interaction.token}`;
+    return `${baseDiscordApiUrl}/webhooks/${env.clientId}/${interaction.token}`;
 }
 
 function getInteractionResponse(type, message, options) {
@@ -48,7 +48,9 @@ export async function handleInteractionAsync(interaction) {
 
     async function followUp(message, options) {
         return fetch(interactionResponseFollowupEndpoint(interaction), {
-            ...getJSONResponse(message, options),
+            ...getJSONResponse(
+                getMessage(message, options)
+            ),
             method: "POST",
         });
     }
