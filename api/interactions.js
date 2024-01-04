@@ -30,7 +30,7 @@ export default async function handler(req, res) {
             const response = await handleInteractionAsync(interaction);
             if (response.headers) {
                 for (let [header, value] of Object.entries(response.headers)) {
-                    res.headers.set(header, value);
+                    res.setHeader(header, value);
                 }
             }
             res.send(res.body);
