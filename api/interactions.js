@@ -2,10 +2,19 @@ import { InteractionResponseType, InteractionType } from "discord-interactions";
 import { authenticate } from "../authentication.js";
 import { handleInteractionAsync } from "../handle-interaction.js";
 
+async function buffer(readable) {
+    const chunks = [];
+    for await (const chunk of readable) {
+        chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+    }
+    return Buffer.concat(chunks);
+}
+
 export default async function handler(req, res) {
-    if (!authenticate(req.headers, req.body)) {
+    if (!authenticate(req.headers, buffer(req))) {
         res.status(401);
         res.send("Unauthorized");
+        return;
     }
 
     // Vercel seems to be going to parse our request body.
