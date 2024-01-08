@@ -2,6 +2,10 @@ import { InteractionResponseType, InteractionType } from "discord-interactions";
 import { authenticate } from "../authentication.js";
 import { handleInteractionAsync } from "../handle-interaction.js";
 
+export const config = {
+    runtime: "edge",
+};
+
 async function buffer(readable) {
     const chunks = [];
     for await (const chunk of readable) {
@@ -12,6 +16,7 @@ async function buffer(readable) {
 }
 
 export default async function handler(req, res) {
+    console.log(`typeof EdgeRuntime: ${typeof EdgeRuntime}`);
     const rawBody =  req.rawBody ?? await buffer(req);
     if (!authenticate(req.headers, rawBody)) {
         res.status(401);
