@@ -12,7 +12,8 @@ async function buffer(readable) {
 }
 
 export default async function handler(req, res) {
-    if (!authenticate(req.headers, await buffer(req))) {
+    const rawBody =  req.rawBody ?? await buffer(req);
+    if (!authenticate(req.headers, rawBody)) {
         res.status(401);
         res.send("Unauthorized");
         return;

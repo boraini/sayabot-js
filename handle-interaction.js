@@ -4,10 +4,13 @@ import { getJSONResponse } from "./globals.js";
 import env from "./env.js";
 import { setCommands, handleInteraction } from "./commands/commands.js";
 import { ApplicationCommandType } from "discord.js";
-import { WebhookService } from "./webhooks/webhook-service.js";
 
 const commandClient = {};
 setCommands(commandClient);
+
+function interactionResponseCreateEndpoint(interaction) {
+    return `${baseDiscordApiUrl}/interactions/${interaction.id}/${interaction.token}/callback`;
+}
 
 function interactionResponseEditEndpoint(interaction) {
     return `${baseDiscordApiUrl}/webhooks/${env.clientId}/${interaction.token}/messages/@original`;
@@ -36,16 +39,6 @@ function getMessage(message, options) {
  */
 export async function handleInteractionAsync(interaction) {
     /* Responding Functions */
-
-    async function editReply(message, options) {
-        return fetch(interactionResponseEditEndpoint(interaction), {
-            ...getJSONResponse(
-                getMessage(message, options)
-            ),
-            method: "PATCH",
-        });
-    }
-
     async function followUp(message, options) {
         return fetch(interactionResponseFollowupEndpoint(interaction), {
             ...getJSONResponse(
@@ -68,9 +61,12 @@ export async function handleInteractionAsync(interaction) {
     async function clientResolver(resolve, reject) {
         async function deferReply() {
             interaction.deferred = true;
-            resolve(getJSONResponse({
-                type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
-            }));
+            fetch(interactionResponseCreateEndpoint(interaction), {
+                ...getJSONResponse({
+                    type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+                }),
+                method: "POST"
+            });
         }
     
         function reply(message, options) {
@@ -80,7 +76,23 @@ export async function handleInteractionAsync(interaction) {
             ));
         }
 
-        const myInteraction = {...interaction, deferReply, reply, editReply, followUp, isMessageContextMenuCommand, isChatInputCommand};
+        const myInteraction = {...interaction, deferReply, reply, followUp, isMessageContextMenuCommand, isChatInputCommand};
+
+        async function editReply(message, options) {
+            // I couldn't find documentation for this. We are creating a response both through the Webhook API and also through the response of the interaction endpoint call.
+            if (myInteraction.deferred) {
+                myInteraction.reply(message, options);
+            } else {
+                return fetch(interactionResponseEditEndpoint(interaction), {
+                    ...getJSONResponse(
+                        getMessage(message, options)
+                    ),
+                    method: "PATCH",
+                });
+            }
+        };
+
+        myInteraction.editReply = editReply;
 
         myInteraction.commandName = interaction.data.name;
         myInteraction.options = new Map();
