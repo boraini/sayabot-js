@@ -12,12 +12,14 @@ export const config = {
 
 export default async function handler(req, res) {
     const rawBody =  req.rawBody ?? await buffer(req);
-    req.body = JSON.parse(rawBody.toString("utf8"));
+    
     if (!authenticate(req.headers, rawBody)) {
         res.status(401);
         res.send("Unauthorized");
         return;
     }
+    
+    req.body = JSON.parse(rawBody.toString("utf8"));
 
     // Vercel seems to be going to parse our request body.
     let interaction = req.body;
