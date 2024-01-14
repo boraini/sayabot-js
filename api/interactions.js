@@ -3,13 +3,6 @@ import { authenticate } from "../authentication.js";
 import { handleInteractionAsync } from "../handle-interaction.js";
 import { buffer } from "micro";
 
-/** @type {import("next").PageConfig} */
-export const config = {
-    api: {
-      bodyParser: false,
-    },
-};
-
 export default async function handler(req, res) {
     const rawBody =  req.rawBody ?? await buffer(req);
     
@@ -18,8 +11,6 @@ export default async function handler(req, res) {
         res.send("Unauthorized");
         return;
     }
-    
-    req.body = JSON.parse(rawBody.toString("utf8"));
 
     // Vercel seems to be going to parse our request body.
     let interaction = req.body;
