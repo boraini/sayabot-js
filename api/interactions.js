@@ -1,28 +1,18 @@
 import { InteractionResponseType, InteractionType } from "discord-interactions";
 import { authenticate } from "../authentication.js";
 import { handleInteractionAsync } from "../handle-interaction.js";
+import { buffer } from "micro";
 
+/** @type {import("next").PageConfig} */
 export const config = {
     api: {
       bodyParser: false,
     },
 };
 
-async function buffer(readable) {
-    const chunks = [];
-    for await (const chunk of readable) {
-        console.log(chunk.toString());
-        chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-    }
-    console.log(`Number of chunks: ${chunks.length}`);
-    const rawBody = Buffer.concat(chunks);
-    console.log(rawBody.toString("utf8"));
-    return rawBody;
-}
-
 export default async function handler(req, res) {
     const rawBody =  req.rawBody ?? await buffer(req);
-    console.log(req.body);
+    req.body = JSON.parse(rawBody.toString("utf8"));
     if (!authenticate(req.headers, rawBody)) {
         res.status(401);
         res.send("Unauthorized");
