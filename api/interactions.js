@@ -2,6 +2,12 @@ import { InteractionResponseType, InteractionType } from "discord-interactions";
 import { authenticate } from "../authentication.js";
 import { handleInteractionAsync } from "../handle-interaction.js";
 
+export const config = {
+    api: {
+      bodyParser: false,
+    },
+};
+
 async function buffer(readable) {
     const chunks = [];
     for await (const chunk of readable) {
@@ -16,6 +22,7 @@ async function buffer(readable) {
 
 export default async function handler(req, res) {
     const rawBody =  req.rawBody ?? await buffer(req);
+    console.log(req.body);
     if (!authenticate(req.headers, rawBody)) {
         res.status(401);
         res.send("Unauthorized");
