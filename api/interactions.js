@@ -2,21 +2,19 @@ import { InteractionResponseType, InteractionType } from "discord-interactions";
 import { authenticate } from "../authentication.js";
 import { handleInteractionAsync } from "../handle-interaction.js";
 
-export const config = {
-    runtime: "edge",
-};
-
 async function buffer(readable) {
     const chunks = [];
     for await (const chunk of readable) {
         console.log(chunk.toString());
         chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
     }
-    return Buffer.concat(chunks);
+    console.log(`Number of chunks: ${chunks.length}`);
+    const rawBody = Buffer.concat(chunks);
+    console.log(rawBody.toString("utf8"));
+    return rawBody;
 }
 
 export default async function handler(req, res) {
-    console.log(`typeof EdgeRuntime: ${typeof EdgeRuntime}`);
     const rawBody =  req.rawBody ?? await buffer(req);
     if (!authenticate(req.headers, rawBody)) {
         res.status(401);
