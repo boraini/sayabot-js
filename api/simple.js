@@ -1,6 +1,6 @@
 import { InteractionResponseType } from "discord-interactions";
 import { buffer } from "micro";
-import { authenticate } from "../authentication";
+import { authenticate } from "../authentication.js";
 
 export const config = {
     api: {
