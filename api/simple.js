@@ -3,7 +3,6 @@ import { buffer } from "micro";
 import { authenticate } from "../authentication";
 
 export const config = {
-    runtime: "edge",
     api: {
         bodyParser: false,
     },
