@@ -1,19 +1,16 @@
-import { conversational } from "@huggingface/inference";
+import { textGeneration } from "@huggingface/inference";
 import env from "../env.js";
 import { getMessageResponse, getErrorResponse } from "../personality-helpers/standard-response.js";
 
-const CONVERSATION_LENGTH_LIMIT = 3;
+const CONVERSATION_LENGTH_LIMIT = 6;
 
-export class HuggingFaceConversation {
+export class HuggingFaceTextGenerationConversation {
     constructor(myName, otherName, model) {
-        this.type = "HuggingFaceConversation";
+        this.type = "HuggingFaceTextGenerationConversation";
         this.model = model;
         this.myName = myName;
         this.otherName = otherName;
-        this.conversation = {
-            past_user_inputs: [],
-            generated_responses: [],
-        };
+        this.conversation = [];
     }
 
     /** Returns the error (to be console.errored) iff the conversation is going well on the code side. Also responds to the message if there is a problem.
@@ -34,18 +31,18 @@ export class HuggingFaceConversation {
         this.lastMessage = message;
 
         async function resolver(resolve, reject) {
-            const conversationOutput = await conversational({
+            scope.conversation.push(message);
+            const conversationOutput = await textGeneration({
                 accessToken: env.huggingfaceToken,
                 model: scope.model,
-                inputs: { ...scope.conversation, text: message },
+                inputs: scope.conversation.join(" "),
             });
     
             let error;
     
             if (!(error = scope.pollConversationError(conversationOutput))) {
-                scope.conversation = conversationOutput.conversation;
-                if (scope.conversation.past_user_inputs.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.past_user_inputs.shift();
-                if (scope.conversation.generated_responses.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.generated_responses.shift();
+                scope.conversation.push(conversationOutput.generated_text);
+                if (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
                 resolve(conversationOutput.generated_text);
             } else {
                 console.log(error);
@@ -59,7 +56,7 @@ export class HuggingFaceConversation {
     async end() {}
 
     static hydrate(obj) {
-        const conversation = new HuggingFaceConversation(obj.myName, obj.otherName, obj.model);
+        const conversation = new HuggingFaceTextGenerationConversation(obj.myName, obj.otherName, obj.model);
         conversation.conversation = obj.conversation;
         conversation.lastMessage = obj.lastMessage;
 

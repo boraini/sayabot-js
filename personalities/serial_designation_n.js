@@ -1,4 +1,4 @@
-import { HuggingFaceConversation } from "../personality-helpers/huggingface.js";
+import { HuggingFaceTextGenerationConversation } from "../personality-helpers/huggingface-text-generation.js";
 
 const data = {
     nickname: "serial_designation_n",
@@ -11,7 +11,7 @@ const webhookData = {
     displayName: "Serial-Designation N",
 };
 
-class Conversation extends HuggingFaceConversation {
+class Conversation extends HuggingFaceTextGenerationConversation {
     constructor(nickname) {
         super("Serial-Designation N", nickname, "facebook/blenderbot-3B");
     }

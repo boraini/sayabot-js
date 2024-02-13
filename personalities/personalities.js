@@ -3,6 +3,7 @@ import innkeeper from "./innkeeper.js";
 import serial_designation_n from "./serial_designation_n.js";
 import reverse from "./reverse.js";
 import { HuggingFaceConversation } from "../personality-helpers/huggingface.js";
+import { HuggingFaceTextGenerationConversation } from "../personality-helpers/huggingface-text-generation.js";
 
 export const personalities = {
     joshua,
@@ -16,6 +17,9 @@ export function hydrateConversation(conv) {
     switch(conv.type) {
         case "ReverseConversation":
             result = reverse.Conversation.hydrate(conv);
+            break;
+        case "HuggingFaceTextGenerationConversation":
+            result = HuggingFaceTextGenerationConversation.hydrate(conv);
             break;
         case "HuggingFaceConversation":
         default:
