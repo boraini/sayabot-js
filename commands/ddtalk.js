@@ -94,6 +94,7 @@ async function executeInternal(interaction) {
     }
 
     const response = await conversation.respond(input);
+    CurrentConversationsDatabase.put(otherIdentifier, conversation);
     await sendResponse(interaction, conversation, response);
 }
 
