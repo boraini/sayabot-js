@@ -1,9 +1,11 @@
 import { SlashCommandBuilder } from "discord.js";
 import { personalities, hydrateConversation } from "../personalities/personalities.js";
 import { CurrentConversationsDatabase } from "../database/conversations-database-mongodb.js";
-import { getMessageResponse, getErrorResponse } from "../personality-helpers/standard-response.js";
+import { getErrorResponse } from "../personality-helpers/standard-response.js";
+import { getJSONResponse } from "./webhook-endpoints.js";
 import { WebhookService } from "../webhooks/webhook-service.js";
 import { connectDb, disconnectDb } from "../database/mongodb.js";
+import { baseUrl } from "../globals.js";
 
 const data = new SlashCommandBuilder()
     .setName("ddtalk")
@@ -28,19 +30,15 @@ function findPersonality(query) {
 }
 
 // PROBLEM: If the user starts a conversation and goes to DMs, the bot will crash because of interaction.channel
-async function sendResponse(interaction, conversation, response) {
-    if (interaction.webhookClientPromise) {
-        const editReplyPromise = interaction.editReply(conversation.lastMessage);
-        const webhookClient = await interaction.webhookClientPromise;
-        await webhookClient.send({
-            content: response,
-            avatarURL: conversation.webhookData.avatar,
-            username: conversation.webhookData.displayName,
+// { conversationInfo, interactionToken, channelWebhook, uniqueIdentifier }
+async function callEdgeApi(conversationInfo, interactionToken, channelWebhook, otherIdentifier) {
+    return new Promise((resolve) => {
+        fetch(`${baseUrl}/api/ddtalk-edge`, {
+            method: "POST",
+            ...getJSONResponse({ conversationInfo, interactionToken, channelWebhook, otherIdentifier })
         });
-        await editReplyPromise;
-    } else {
-        await interaction.editReply(getMessageResponse(conversation, response));
-    }
+        setTimeout(resolve, 250);
+    })
 }
 
 function setupWebhook(interaction, personality, conversation) {
@@ -62,11 +60,14 @@ async function executeInternal(interaction) {
     let conversation;
 
     const foundConversation = await CurrentConversationsDatabase.get(otherIdentifier);
+
+    let webhookClientInfoPromise;
+
     if (foundConversation) {
-        conversation = hydrateConversation(foundConversation);
+        conversation = foundConversation;
         // Request webhook here so we save some time.
         if (conversation.webhookData && interaction.channel) {
-            interaction.webhookClientPromise = WebhookService.getChannelClient(interaction.channel);
+            webhookClientInfoPromise = WebhookService.getChannelClientInfo(interaction.channel);
         }
     } else {
         const personality = findPersonality(input);
@@ -87,15 +88,16 @@ async function executeInternal(interaction) {
     }
 
     if (input.toLowerCase() == "end") {
+        conversation = hydrateConversation(conversation);
         await conversation.end();
         await CurrentConversationsDatabase.remove(otherIdentifier);
         await interaction.editReply(getErrorResponse(conversation, `Conversation with ${conversation.myName} ended successfully.`));
         return;
     }
 
-    const response = await conversation.respond(input);
-    CurrentConversationsDatabase.put(otherIdentifier, conversation);
-    await sendResponse(interaction, conversation, response);
+    conversation.lastMessage = input;
+    await callEdgeApi(conversation, interaction.token, webhookClientInfoPromise ? await webhookClientInfoPromise : undefined, otherIdentifier);
+    await interaction.deferReply();
 }
 
 /** Wrapper for ddtalk.executeInternal. If the execution gets a part that can be executed in parallel with interaction.deferReply, it

@@ -1,8 +1,12 @@
 import { Client, REST, GatewayIntentBits, Events, Routes } from "discord.js";
-import env from "./env.js";
+import env, { reloadEnv } from "./env.js";
 import { connectDb } from "./database/mongodb.js";
 import { setCommands } from "./commands/commands.js";
 import { handleInteraction } from "./commands/commands.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+reloadEnv();
 
 function getClient() {
     const client = new Client({

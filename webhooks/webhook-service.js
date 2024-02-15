@@ -1,7 +1,7 @@
 import { WebhookClient } from "discord.js"
 import { WebhookDatabase } from "../database/webhook-database-mongodb.js";
 import env from "../env.js";
-import { baseDiscordApiUrl, getJSONResponse } from "../globals.js";
+import { baseDiscordApiUrl, getJSONResponse } from "../commands/webhook-endpoints.js";
 
 function createWebhookEndpoint(channel) {
     return `${baseDiscordApiUrl}/channels/${channel.id}/webhooks`;
@@ -13,7 +13,7 @@ export const WebhookService = {
      * @param {import("discord.js").Client}
      * @param {import("discord.js").TextChannel} channel 
      */
-    async getChannelClient(channel) {
+    async getChannelClientInfo(channel) {
         let info = await WebhookDatabase.get({channelId: channel.id});
 
         if (!info) {
@@ -31,7 +31,11 @@ export const WebhookService = {
             info.token = env.discordToken;
         }
 
-        return new WebhookClient(info);
+        return info;
+    },
+
+    async getChannelClient(channel) {
+        return WebhookService.getChannelClientInfo(channel).then(info => new WebhookClient(info));
     },
 
     async createWebhook(channel, options) {
