@@ -1,7 +1,7 @@
 import { InteractionResponseType, InteractionType } from "discord-interactions";
 import { authenticate } from "./authentication.js";
 import { handleInteractionAsync } from "./handle-interaction.js";
-import { getJSONResponse } from "./globals.js";
+import { getJSONResponse } from "./commands/webhook-endpoints.js";
 
 export async function handler(event) {
     if (!authenticate(event.headers, event.body)) {

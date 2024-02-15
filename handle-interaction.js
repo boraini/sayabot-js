@@ -1,38 +1,12 @@
 import { InteractionResponseType, InteractionType } from "discord-interactions";
-import { baseDiscordApiUrl } from "./globals.js";
-import { getJSONResponse } from "./globals.js";
-import env from "./env.js";
+import { getJSONResponse } from "./commands/webhook-endpoints.js";
 import { setCommands, handleInteraction } from "./commands/commands.js";
 import { ApplicationCommandType } from "discord.js";
 
+import { getInteractionResponse, interactionResponseEditEndpoint, interactionResponseFollowupEndpoint, getMessage } from "./commands/webhook-endpoints.js";
+
 const commandClient = {};
 setCommands(commandClient);
-
-function interactionResponseCreateEndpoint(interaction) {
-    return `${baseDiscordApiUrl}/interactions/${interaction.id}/${interaction.token}/callback`;
-}
-
-function interactionResponseEditEndpoint(interaction) {
-    return `${baseDiscordApiUrl}/webhooks/${env.clientId}/${interaction.token}/messages/@original`;
-}
-
-function interactionResponseFollowupEndpoint(interaction) {
-    return `${baseDiscordApiUrl}/webhooks/${env.clientId}/${interaction.token}`;
-}
-
-function getInteractionResponse(type, message, options) {
-    return {
-        type: type,
-        data: getMessage(message, options),
-    };
-}
-
-function getMessage(message, options) {
-    return {
-        content: message,
-        flags: options?.ephemeral ? 64 : undefined,
-    };
-}
 
 /** Creates an interaction object that is akin to the Discord.js interaction, and passes it to the bot command handler.
  * The returned promise will resolve to an object which you can respond to the interaction endpoint call with.
@@ -61,12 +35,9 @@ export async function handleInteractionAsync(interaction) {
     async function clientResolver(resolve, reject) {
         async function deferReply() {
             interaction.deferred = true;
-            fetch(interactionResponseCreateEndpoint(interaction), {
-                ...getJSONResponse({
-                    type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
-                }),
-                method: "POST"
-            });
+            resolve(getJSONResponse(
+                { type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE }
+            ));
         }
     
         function reply(message, options) {

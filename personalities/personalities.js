@@ -29,6 +29,7 @@ export function hydrateConversation(conv) {
 
     if (result) {
         if (conv.webhookData) result.webhookData = conv.webhookData;
+        result.lastMessage = conv.lastMessage;
     } else {
         console.warn(`Conversation with type ${conv.type} could not be hydrated.`);
     }

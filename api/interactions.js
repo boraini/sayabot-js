@@ -10,6 +10,12 @@ export const config = {
     },
 };
 
+/**
+ * 
+ * @param {import("@vercel/node").VercelRequest} req 
+ * @param {*} res 
+ * @returns 
+ */
 export default async function handler(req, res) {
     const rawBody =  req.rawBody ?? await buffer(req);
 
