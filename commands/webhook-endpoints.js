@@ -38,7 +38,7 @@ export function getMessage(message, options) {
     };
 }
 
-export function editReply(interaction, message, options) {
+export async function editReply(interaction, message, options) {
     return fetch(interactionResponseEditEndpoint(interaction), {
         ...getJSONResponse(
             getMessage(message, options)
@@ -47,10 +47,10 @@ export function editReply(interaction, message, options) {
     });
 }
 
-export function sendWebhookMessage(webhook, message, webhookData) {
+export async function sendWebhookMessage(webhook, message, webhookData) {
     const endpoint = `${baseDiscordApiUrl}/webhooks/${webhook.id}/${webhook.token}`;
 
-    fetch(endpoint, {
+    return fetch(endpoint, {
         method: "POST",
         ...getJSONResponse({
             content: message,

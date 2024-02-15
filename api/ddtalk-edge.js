@@ -28,16 +28,16 @@ export default async function handler(req, res) {
     try {
         response = await conversation.respond(conversation.lastMessage);
     } catch (e) {
-        editReply({ token: interactionToken }, `There is something wrong with ${conversation.myName}. Consider ending this conversation with them and starting a new one.`);
+        await editReply({ token: interactionToken }, `There is something wrong with ${conversation.myName}. Consider ending this conversation with them and starting a new one.`);
         res.send("ERROR");
         return;
     }
 
     if (channelWebhook) {
-        editReply({ token: interactionToken }, conversation.lastMessage);
-        sendWebhookMessage(channelWebhook, response, conversation.webhookData);
+        await editReply({ token: interactionToken }, conversation.lastMessage);
+        await sendWebhookMessage(channelWebhook, response, conversation.webhookData);
     } else {
-        editReply({ token: interactionToken }, getMessageResponse(conversation, response));
+        await editReply({ token: interactionToken }, getMessageResponse(conversation, response));
     }
 
     await fetch(`${baseUrl}/api/ddtalk-save-conversation?uniqueIdentifier=${otherIdentifier}`, {
