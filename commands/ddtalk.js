@@ -97,6 +97,7 @@ async function executeInternal(interaction) {
 
     conversation.lastMessage = input;
     await callEdgeApi(conversation, interaction.token, webhookClientInfoPromise ? await webhookClientInfoPromise : undefined, otherIdentifier);
+    console.log("edge api called");
     await interaction.deferReply();
 }
 
