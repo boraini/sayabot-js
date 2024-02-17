@@ -36,8 +36,7 @@ async function callEdgeApi(conversationInfo, interactionToken, channelWebhook, o
         fetch(`${baseUrl}/api/ddtalk-edge`, {
             method: "POST",
             ...getJSONResponse({ conversationInfo, interactionToken, channelWebhook, otherIdentifier })
-        });
-        setTimeout(resolve, 250);
+        }).then(resolve);
     })
 }
 
@@ -97,8 +96,7 @@ async function executeInternal(interaction) {
 
     conversation.lastMessage = input;
     await callEdgeApi(conversation, interaction.token, webhookClientInfoPromise ? await webhookClientInfoPromise : undefined, otherIdentifier);
-    console.log("edge api called");
-    await interaction.deferReply();
+    if (!interaction.deferred) await interaction.deferReply();
 }
 
 /** Wrapper for ddtalk.executeInternal. If the execution gets a part that can be executed in parallel with interaction.deferReply, it
@@ -108,9 +106,10 @@ async function executeInternal(interaction) {
  * @returns 
  */
 async function execute(interaction) {
-    await connectDb();
-    await executeInternal(interaction);
-    // await disconnectDb();
+    const timeoutPromise = new Promise(resolve => setTimeout(() => {if (!interaction.deferred) resolve()}, 3000));
+    const executePromise = connectDb().then(() => executeInternal(interaction));
+
+    return Promise.race([timeoutPromise, executePromise]);
 }
 
 export default { data, execute };
