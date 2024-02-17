@@ -51,8 +51,6 @@ function setupWebhook(interaction, personality, conversation) {
  * @param {import("discord.js").ChatInputCommandInteraction} interaction 
  */
 async function executeInternal(interaction) {
-    await interaction.deferReply();
-
     const otherIdentifier = interaction.user.username + "#" + interaction.user.discriminator;
     const input = interaction.options.get("message").value;
 
