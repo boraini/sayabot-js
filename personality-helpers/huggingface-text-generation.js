@@ -29,7 +29,7 @@ export class HuggingFaceTextGenerationConversation {
     async respond(message) {
         const scope = this;
         this.lastMessage = message;
-
+        console.log("responding");
         async function resolver(resolve, reject) {
             scope.conversation.push(message);
             const conversationOutput = await textGeneration({
@@ -43,6 +43,7 @@ export class HuggingFaceTextGenerationConversation {
             if (!(error = scope.pollConversationError(conversationOutput))) {
                 scope.conversation.push(conversationOutput.generated_text);
                 if (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
+                console.log("responded");
                 resolve(conversationOutput.generated_text);
             } else {
                 console.log(error);
