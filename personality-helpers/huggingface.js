@@ -34,13 +34,11 @@ export class HuggingFaceConversation {
         this.lastMessage = message;
 
         async function resolver(resolve, reject) {
+            try {
             const conversationOutput = await conversational({
                 accessToken: env.huggingfaceToken,
                 model: scope.model,
                 inputs: { ...scope.conversation, text: message },
-            }).catch(e => {
-                console.error(e);
-                reject(getErrorResponse(scope, `Something is wrong with ${scope.myName}.`));
             });
     
             let error;
@@ -53,6 +51,9 @@ export class HuggingFaceConversation {
             } else {
                 console.log(error);
                 reject(getErrorResponse(scope, `Something is wrong with ${scope.myName}.`));
+            }
+            } catch (e) {
+                reject(e);
             }
         }
         

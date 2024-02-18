@@ -31,14 +31,12 @@ export class HuggingFaceTextGenerationConversation {
         this.lastMessage = message;
         console.log("responding");
         async function resolver(resolve, reject) {
+            try {
             scope.conversation.push(message);
             const conversationOutput = await textGeneration({
                 accessToken: env.huggingfaceToken,
                 model: scope.model,
                 inputs: scope.conversation.join(" "),
-            }).catch(e => {
-                console.error(e);
-                reject(getErrorResponse(scope, `Something is wrong with ${scope.myName}.`));
             });
     
             let error;
@@ -51,6 +49,9 @@ export class HuggingFaceTextGenerationConversation {
             } else {
                 console.log(error);
                 reject(getErrorResponse(scope, `Something is wrong with ${scope.myName}.`));
+            }
+            } catch (e) {
+                reject(e);
             }
         }
         
