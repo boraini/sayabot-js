@@ -31,8 +31,7 @@ export default async function handler(req, res) {
     } catch (e) {
         console.error(e);
         await editReply({ token: interactionToken }, `The conversation data seems to be corrupt. Please consider ending it and start a new one.`);
-        res.send("ERROR");
-        return;
+        return new Response("ERROR");
     }
 
     let response;
@@ -42,8 +41,7 @@ export default async function handler(req, res) {
     } catch (e) {
         console.error(e);
         await editReply({ token: interactionToken }, `There is something wrong with ${conversation.myName}. Consider ending this conversation with them and starting a new one.`);
-        res.send("ERROR");
-        return;
+        return new Response("ERROR");
     }
 
     if (channelWebhook) {
@@ -58,5 +56,5 @@ export default async function handler(req, res) {
         ...getJSONResponse(conversation),
     })
 
-    res.send(response);
+    return new Response(response);
 }
