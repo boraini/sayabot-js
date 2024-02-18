@@ -36,6 +36,9 @@ export class HuggingFaceTextGenerationConversation {
                 accessToken: env.huggingfaceToken,
                 model: scope.model,
                 inputs: scope.conversation.join(" "),
+            }).catch(e => {
+                console.error(e);
+                reject(getErrorResponse(scope, `Something is wrong with ${scope.myName}.`));
             });
     
             let error;
