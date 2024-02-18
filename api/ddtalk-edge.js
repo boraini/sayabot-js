@@ -21,13 +21,23 @@ export default async function handler(req, res) {
 
     const { conversationInfo, interactionToken, channelWebhook, otherIdentifier } = req.body;
 
-    const conversation = hydrateConversation(conversationInfo);
+    let conversation;
+
+    try {
+        conversation = hydrateConversation(conversationInfo);
+    } catch (e) {
+        console.error(e);
+        await editReply({ token: interactionToken }, `The conversation data seems to be corrupt. Please consider ending it and start a new one.`);
+        res.send("ERROR");
+        return;
+    }
 
     let response;
 
     try {
         response = await conversation.respond(conversation.lastMessage);
     } catch (e) {
+        console.error(e);
         await editReply({ token: interactionToken }, `There is something wrong with ${conversation.myName}. Consider ending this conversation with them and starting a new one.`);
         res.send("ERROR");
         return;

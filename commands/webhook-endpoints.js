@@ -59,3 +59,12 @@ export async function sendWebhookMessage(webhook, message, webhookData) {
         }),
     });
 }
+
+export async function deferReplyWebhook(interaction) {
+    return fetch(interactionResponseCreateEndpoint(interaction), {
+        ...getJSONResponse(
+            { type: 5 },
+        ),
+        method: "POST",
+    }).then(r => r.text(), () => console.log("there was an error creating the response")).then(r => console.log(r));
+}

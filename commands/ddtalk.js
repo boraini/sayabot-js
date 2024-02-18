@@ -6,6 +6,7 @@ import { getJSONResponse } from "./webhook-endpoints.js";
 import { WebhookService } from "../webhooks/webhook-service.js";
 import { connectDb, disconnectDb } from "../database/mongodb.js";
 import { baseUrl } from "../globals.js";
+import { deferReplyWebhook } from "./webhook-endpoints.js";
 
 const data = new SlashCommandBuilder()
     .setName("ddtalk")
@@ -51,11 +52,13 @@ function setupWebhook(interaction, personality, conversation) {
  * @param {import("discord.js").ChatInputCommandInteraction} interaction 
  */
 async function executeInternal(interaction) {
+    await deferReplyWebhook(interaction);
     const otherIdentifier = interaction.user.username + "#" + interaction.user.discriminator;
     const input = interaction.options.get("message").value;
 
     let conversation;
 
+    await connectDb();
     const foundConversation = await CurrentConversationsDatabase.get(otherIdentifier);
 
     let webhookClientInfoPromise;
@@ -105,7 +108,7 @@ async function executeInternal(interaction) {
  */
 async function execute(interaction) {
     const timeoutPromise = new Promise(resolve => setTimeout(() => {if (!interaction.deferred) resolve()}, 3000));
-    const executePromise = connectDb().then(() => executeInternal(interaction));
+    const executePromise = executeInternal(interaction);
 
     return Promise.race([timeoutPromise, executePromise]);
 }
