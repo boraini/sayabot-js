@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
     console.log(req.body);
 
-    const { conversationInfo, interactionToken, channelWebhook, otherIdentifier } = req.body;
+    const { conversationInfo, interactionToken, channelWebhook, otherIdentifier } = await req.json();
 
     let conversation;
 
