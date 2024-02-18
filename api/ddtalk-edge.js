@@ -19,6 +19,8 @@ export default async function handler(req, res) {
         res.status(405).send("Method Not Allowed");
     }
 
+    console.log(req.body);
+
     const { conversationInfo, interactionToken, channelWebhook, otherIdentifier } = req.body;
 
     let conversation;
