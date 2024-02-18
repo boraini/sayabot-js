@@ -52,7 +52,7 @@ export default async function handler(req, res) {
         await editReply({ token: interactionToken }, getMessageResponse(conversation, response));
     }
 
-    await fetch(`${baseUrl}/api/ddtalk-save-conversation?uniqueIdentifier=${otherIdentifier}`, {
+    await fetch(`${baseUrl}/api/ddtalk-save-conversation/?uniqueIdentifier=${otherIdentifier}`, {
         method: "POST",
         ...getJSONResponse(conversation),
     })

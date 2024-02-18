@@ -34,7 +34,7 @@ function findPersonality(query) {
 // { conversationInfo, interactionToken, channelWebhook, uniqueIdentifier }
 async function callEdgeApi(conversationInfo, interactionToken, channelWebhook, otherIdentifier) {
     return new Promise((resolve) => {
-        fetch(`${baseUrl}/api/ddtalk-edge`, {
+        fetch(`${baseUrl}/api/ddtalk-edge/`, {
             method: "POST",
             ...getJSONResponse({ conversationInfo, interactionToken, channelWebhook, otherIdentifier })
         }).then(resolve);
