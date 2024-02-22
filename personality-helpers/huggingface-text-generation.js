@@ -39,7 +39,7 @@ export class HuggingFaceTextGenerationConversation {
             inputs: scope.conversation.join(" "),
         });
 
-        const response = conversationOutput.generated_text.substring(scope.conversation.reduce((a, b) => a + b.length, 0), conversationOutput.generated_text.length);
+        const response = conversationOutput.generated_text;
         scope.conversation.push(response);
         while (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
 

@@ -12,8 +12,6 @@ export default async function handler(req, res) {
         res.status(405).send("Method Not Allowed");
     }
 
-    console.log(req.body);
-
     await connectDb();
     await CurrentConversationsDatabase.put(req.query["uniqueIdentifier"], req.body);
 
