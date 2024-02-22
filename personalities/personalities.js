@@ -2,6 +2,7 @@ import joshua from "./joshua.js";
 import innkeeper from "./innkeeper.js";
 import serial_designation_n from "./serial_designation_n.js";
 import reverse from "./reverse.js";
+import bard from "./bard.js";
 import { HuggingFaceConversation } from "../personality-helpers/huggingface.js";
 import { HuggingFaceTextGenerationConversation } from "../personality-helpers/huggingface-text-generation.js";
 
@@ -10,6 +11,7 @@ export const personalities = {
     innkeeper,
     serial_designation_n,
     reverse,
+    bard,
 };
 
 export function hydrateConversation(conv) {
