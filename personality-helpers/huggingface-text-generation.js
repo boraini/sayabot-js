@@ -40,6 +40,9 @@ export class HuggingFaceTextGenerationConversation {
             accessToken: env.huggingfaceToken,
             model: scope.model,
             inputs: inputConversation,
+            parameters: {
+                truncation: "only_first",
+            },
         });
 
         const response = (() => {
