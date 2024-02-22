@@ -14,13 +14,21 @@ export const WebhookService = {
      * @param {import("discord.js").TextChannel} channel 
      */
     async getChannelClientInfo(channel) {
+        if (!channel == null) return null;
+
         let info = await WebhookDatabase.get({channelId: channel.id});
 
         if (!info) {
-            info = await WebhookService.createWebhook(channel, {
-                name: "SayaBot Webhook",
-                reason: "Send DDTalk messages with profile picture on this channel.",
-            });
+            try {
+                info = await WebhookService.createWebhook(channel, {
+                    name: "SayaBot Webhook",
+                    reason: "Send DDTalk messages with profile picture on this channel.",
+                });
+            } catch (e) {
+                console.warn(e);
+                return null;
+            }
+
             if (!info.channelId && info.channel_id) info.channelId = info.channel_id;
             console.warn("Created new Webhook with the following information.");
             console.dir(info);
@@ -46,6 +54,9 @@ export const WebhookService = {
         return fetch(createWebhookEndpoint(channel), {
             ...getJSONResponse(options),
             method: "POST",
-        }).then(r => r.json());
+        }).then(r => {
+            if (!r.ok) throw new Error("Error in creating webhook.");
+            return r.json()
+        });
     }
 }
