@@ -94,14 +94,17 @@ async function executeInternal(interaction) {
     }
 
     conversation.lastMessage = input;
-    await webhookClientInfoPromise ? webhookClientInfoPromise.then(
+
+    console.log("calling edge api");
+    await (webhookClientInfoPromise ? webhookClientInfoPromise.then(
         // channel uses webhooks and webhook is OK
         webhookClientInfo => callEdgeApi(conversation, interaction.token, webhookClientInfo, otherIdentifier),
         // channel could use webhooks but/or the webhook is not OK (webhook could not be created)
         e => callEdgeApi(conversation, interaction.token, undefined, otherIdentifier)
     )
     // channel does not use webhooks (DMs)
-    : callEdgeApi(conversation, interaction.token, undefined, otherIdentifier);
+    : callEdgeApi(conversation, interaction.token, undefined, otherIdentifier));
+    console.log("called edge api");
     
     if (!interaction.deferred) await interaction.deferReply();
 }
