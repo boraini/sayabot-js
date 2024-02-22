@@ -29,33 +29,23 @@ export class HuggingFaceTextGenerationConversation {
     async respond(message) {
         const scope = this;
         this.lastMessage = message;
+
         console.log("responding");
-        async function resolver(resolve, reject) {
-            try {
-            scope.conversation.push(message);
-            const conversationOutput = await textGeneration({
-                accessToken: env.huggingfaceToken,
-                model: scope.model,
-                inputs: scope.conversation.join(" "),
-            });
-    
-            let error;
-    
-            if (!(error = scope.pollConversationError(conversationOutput))) {
-                scope.conversation.push(conversationOutput.generated_text);
-                if (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
-                console.log("responded");
-                resolve(conversationOutput.generated_text.substring(scope.conversation.reduce((a, b) => a + b.length, 0), conversationOutput.generated_text.length));
-            } else {
-                console.log(error);
-                reject(getErrorResponse(scope, `Something is wrong with ${scope.myName}.`));
-            }
-            } catch (e) {
-                reject(e);
-            }
-        }
-        
-        return new Promise(resolver);
+
+        scope.conversation.push(message);
+        const conversationOutput = await textGeneration({
+            accessToken: env.huggingfaceToken,
+            model: scope.model,
+            inputs: scope.conversation.join(" "),
+        });
+
+        const response = conversationOutput.generated_text.substring(scope.conversation.reduce((a, b) => a + b.length, 0), conversationOutput.generated_text.length);
+        scope.conversation.push(response);
+        while (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
+
+        console.log("responded");
+
+        return response;
     }
 
     async end() {}
