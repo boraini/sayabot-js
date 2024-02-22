@@ -33,12 +33,10 @@ function findPersonality(query) {
 // PROBLEM: If the user starts a conversation and goes to DMs, the bot will crash because of interaction.channel
 // { conversationInfo, interactionToken, channelWebhook, uniqueIdentifier }
 async function callEdgeApi(conversationInfo, interactionToken, channelWebhook, otherIdentifier) {
-    return new Promise((resolve) => {
-        fetch(`${baseUrl}/api/ddtalk-edge/`, {
-            method: "POST",
-            ...getJSONResponse({ conversationInfo, interactionToken, channelWebhook, otherIdentifier })
-        }).then(resolve);
-    })
+    return fetch(`${baseUrl}/api/ddtalk-edge/`, {
+        method: "POST",
+        ...getJSONResponse({ conversationInfo, interactionToken, channelWebhook, otherIdentifier })
+    });
 }
 
 function setupWebhook(interaction, personality, conversation) {

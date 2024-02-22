@@ -55,7 +55,7 @@ export async function sendWebhookMessage(webhook, message, webhookData) {
         ...getJSONResponse({
             content: message,
             username: webhookData.displayName,
-            avatarURL: webhookData.avatar,
+            avatar_url: webhookData.avatar,
         }),
     });
 }
