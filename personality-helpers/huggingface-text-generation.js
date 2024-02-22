@@ -45,7 +45,7 @@ export class HuggingFaceTextGenerationConversation {
                 scope.conversation.push(conversationOutput.generated_text);
                 if (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
                 console.log("responded");
-                resolve(conversationOutput.generated_text);
+                resolve(conversationOutput.generated_text.substring(scope.conversation.reduce((a, b) => a + b.length, 0), conversationOutput.generated_text.length));
             } else {
                 console.log(error);
                 reject(getErrorResponse(scope, `Something is wrong with ${scope.myName}.`));

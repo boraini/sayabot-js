@@ -16,11 +16,8 @@ export const config = {
  */
 export default async function handler(req, res) {
     if (req.method != "POST") {
-        res.status(405).send("Method Not Allowed");
+        return new Response("Method Not Allowed", { status: 405 });
     }
-
-    console.log(req.body);
-    console.dir(res);
 
     const { conversationInfo, interactionToken, channelWebhook, otherIdentifier } = await req.json();
 

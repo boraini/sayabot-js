@@ -52,9 +52,15 @@ polka().use(bodyParser.text({
             res.setHeader(k, v);
         },
     }
+    const myReq = {
+        method: "POST",
+        async json() {
+            return req.body;
+        }
+    }
     req.rawBody = req.body;
     req.body = JSON.parse(req.body);
-    ddtalkEdge(req, myRes);
+    ddtalkEdge(myReq, myRes);
 }).post("/api/ddtalk-save-conversation", async (req, res) => {
     const myRes = {
         status(n) {
