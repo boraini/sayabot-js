@@ -12,7 +12,7 @@ export const CurrentConversationsDatabase = {
 
     async put(username, conversation) {
         const collection = getCollection(collectionName);
-        await collection.replaceOne({ _id: username }, { _id: username, ...conversation }, { upsert: true });
+        await collection.replaceOne({ _id: username }, { _id: username, lastInteraction: new Date(), ...conversation }, { upsert: true });
     },
 
     async exists(username) {

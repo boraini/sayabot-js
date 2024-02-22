@@ -1,13 +1,13 @@
 import { HuggingFaceTextGenerationConversation } from "../personality-helpers/huggingface-text-generation.js";
 
 const data = {
-    nickname: "joshua",
-    description: "A GPT-3 model trained to imitate Joshua from *The World Ends With You.*",
+    nickname: "bard",
+    description: "DistilGPT2. Write your story together with this bot, adding to it in turns!",
 };
 
 class Conversation extends HuggingFaceTextGenerationConversation {
     constructor(nickname) {
-        super("Joshua", nickname, "ThatSkyFox/DialoGPT-small-joshua", true);
+        super("Bard", nickname, "distilbert/distilgpt2", true);
     }
 }
 

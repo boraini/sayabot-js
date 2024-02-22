@@ -5,12 +5,13 @@ import { getMessageResponse, getErrorResponse } from "../personality-helpers/sta
 const CONVERSATION_LENGTH_LIMIT = 6;
 
 export class HuggingFaceTextGenerationConversation {
-    constructor(myName, otherName, model) {
+    constructor(myName, otherName, model, strip) {
         this.type = "HuggingFaceTextGenerationConversation";
         this.model = model;
         this.myName = myName;
         this.otherName = otherName;
         this.conversation = [];
+        this.strip = strip;
     }
 
     /** Returns the error (to be console.errored) iff the conversation is going well on the code side. Also responds to the message if there is a problem.
@@ -29,39 +30,39 @@ export class HuggingFaceTextGenerationConversation {
     async respond(message) {
         const scope = this;
         this.lastMessage = message;
+
         console.log("responding");
-        async function resolver(resolve, reject) {
-            try {
-            scope.conversation.push(message);
-            const conversationOutput = await textGeneration({
-                accessToken: env.huggingfaceToken,
-                model: scope.model,
-                inputs: scope.conversation.join(" "),
-            });
-    
-            let error;
-    
-            if (!(error = scope.pollConversationError(conversationOutput))) {
-                scope.conversation.push(conversationOutput.generated_text);
-                if (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
-                console.log("responded");
-                resolve(conversationOutput.generated_text.substring(scope.conversation.reduce((a, b) => a + b.length, 0), conversationOutput.generated_text.length));
+
+        scope.conversation.push(message);
+
+        const inputConversation = scope.conversation.join("\n");
+        const conversationOutput = await textGeneration({
+            accessToken: env.huggingfaceToken,
+            model: scope.model,
+            inputs: inputConversation,
+        });
+
+        const response = (() => {
+            const value = conversationOutput.generated_text;
+            if (this.strip) {
+                return value.substring(inputConversation.length, value.length);
             } else {
-                console.log(error);
-                reject(getErrorResponse(scope, `Something is wrong with ${scope.myName}.`));
+                return value;
             }
-            } catch (e) {
-                reject(e);
-            }
-        }
-        
-        return new Promise(resolver);
+        })();
+
+        scope.conversation.push(response);
+        while (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
+
+        console.log("responded");
+
+        return response;
     }
 
     async end() {}
 
     static hydrate(obj) {
-        const conversation = new HuggingFaceTextGenerationConversation(obj.myName, obj.otherName, obj.model);
+        const conversation = new HuggingFaceTextGenerationConversation(obj.myName, obj.otherName, obj.model, obj.strip);
         conversation.conversation = obj.conversation;
         conversation.lastMessage = obj.lastMessage;
 
