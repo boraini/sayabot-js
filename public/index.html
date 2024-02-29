@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<div style = "text-align: center;">
+    <h1>Just Say That You Love Me</h1>
+    <p>This form can be used to send messages through SayaBot.</p>
+    <form id="manual-message-form" action="#">
+        <label for="target-message-channel">Target Message Channel: </label>
+        <input id="target-message-channel"name="target-message-channel" type="text"/>
+        <label for="message-text">Message Text</label>
+        <textarea id="message-text" name="message-text"></textarea>
+        <button id="manual-message-submit">Submit!</button>
+    </form> 
+</div>
+
+<script>
+    (function() {
+        /** @type {HTMLFormElement} */
+        const form = document.getElementById("manual-message-form");
+        const targetMessageChannel = form.elements["target-message-channel"];
+        const messageText = form.elements["message-text"];
+        const submit = form.elements["manual-message-submit"];
+
+        console.log(form, targetMessageChannel, messageText, submit);
+    })();
+</script>
+</body>
+</html>
