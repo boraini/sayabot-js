@@ -5,6 +5,7 @@ import ddtalkSaveConversation from "./api/ddtalk-save-conversation.js";
 import ddtalkEdge from "./api/ddtalk-edge.js";
 import dotenv from "dotenv";
 import { reloadEnv } from "./env.js";
+import handlerBallot from "./api/ballot.js";
 
 dotenv.config();
 reloadEnv();
@@ -86,4 +87,4 @@ polka().use(bodyParser.text({
 }).listen(3000, err => {
     if (err) throw err;
     else console.log("Server listening on port 3000.");
-});
+}).post("/api/ballot", handlerBallot);
