@@ -4,6 +4,7 @@ const values = {
     "discordToken": process.env.DISCORD_TOKEN,
     "huggingfaceToken": process.env.HUGGINGFACE_TOKEN,
     "mongodbUri": process.env.MONGODB_URI,
+    "dashboardPassword": process.env.DASHBOARD_PASSWORD,
 };
 
 /** Even more spaghetti code yay. */
@@ -14,6 +15,7 @@ export function reloadEnv() {
         "discordToken": process.env.DISCORD_TOKEN,
         "huggingfaceToken": process.env.HUGGINGFACE_TOKEN,
         "mongodbUri": process.env.MONGODB_URI,
+        "dashboardPassword": process.env.DASHBOARD_PASSWORD,
     });
 }
 
