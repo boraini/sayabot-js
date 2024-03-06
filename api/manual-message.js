@@ -8,7 +8,8 @@ export const config = {
 export default async function handle(req) {
     const requestJSON = await req.json();
     const { dashboardPassword, channelId, message } = requestJSON;
-    
+    console.log(dashboardPassword, env.dashboardPassword, channelId, message);
+
     try {
         if (env.dashboardPassword != dashboardPassword) {
             throw new Error("Not authorized.");

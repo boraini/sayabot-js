@@ -84,6 +84,9 @@
             fetch("/api/manual-message", {
                 method: "POST",
                 body: JSON.stringify({ dashboardPassword, message, channelId }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
             }).then(async r => {
                 if (r.ok) {
                     showSnackbar(snackbarColors.success, "Message sent successfully.");
