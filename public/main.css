@@ -1,0 +1,32 @@
+@keyframes snackbar-anim {
+    0% {bottom: -6em}
+    10% {bottom: 0.5em}
+    90% {bottom: 0.5em}
+    100% {bottom: -6em}
+}
+
+.snackbar {
+    position: fixed;
+    transition: bottom 0.5s, opacity 0.5s;
+    bottom: -6em;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 0.5em;
+    padding: 1em;
+}
+
+.snackbar.active {
+    animation-name: snackbar-anim;
+    animation-duration: 5s;
+    animation-fill-mode: forwards;
+}
+
+.bg-success {
+    background-color: #44ff88;
+    color: black;
+}
+
+.bg-error {
+    background-color: #dd22aa;
+    color: white;
+}

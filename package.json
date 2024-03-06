@@ -19,7 +19,8 @@
     "micro": "^10.0.1",
     "mongodb": "^6.3.0",
     "ngrok": "^5.0.0-beta.2",
-    "polka": "^0.5.2"
+    "polka": "^0.5.2",
+    "serve-static": "^1.15.0"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",

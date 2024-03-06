@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SayaBot Dashboard</title>
+    <link rel="stylesheet" href="/main.css" />
+</head>
+<body>
+<div style = "text-align: center;">
+    <h1>Just Say That You Love Me</h1>
+    <p>This form can be used to send messages through SayaBot.</p>
+    <form id="authentication">
+        <p>
+            <label for="dashboard-password">Dashboard Password: </label>
+            <input id="dashboard-password" name="dashboard-password" type="password" />
+        </p>
+    </form>
+    <form id="manual-message-form">
+        <p>
+            <label for="target-message-channel">Target Message Channel: </label>
+            <input id="target-message-channel" name="target-message-channel" type="text" />
+        </p>
+        <p>
+            <label for="message-text">Message Text</label>
+            <textarea id="message-text" name="message-text"></textarea>
+        </p>
+        <p>
+            <button id="manual-message-submit">Submit!</button>
+        </p>
+    </form> 
+    <p id="snackbar" class="snackbar"></p>
+</div>
+
+<script>
+    let snackbar = document.getElementById("snackbar");
+    const snackbarColors = {
+        success: "bg-success",
+        error: "bg-error",
+    };
+
+    function showSnackbar(colorClass, message) {
+        snackbar.classList.remove("active");
+        Object.values(snackbarColors).forEach(c => snackbar.classList.remove(c));
+        snackbar.classList.add(colorClass);
+        snackbar.classList.add("active");
+        snackbar.innerHTML = message;
+        
+        let newSnackbar = snackbar.cloneNode(true);
+        snackbar.parentNode.replaceChild(newSnackbar, snackbar);
+        snackbar = newSnackbar;
+    }
+
+    /** @type {HTMLFormElement} */
+    const authenticationForm = document.getElementById("authentication");
+
+    function getDashboardPassword() {
+        return authenticationForm.elements["dashboard-password"].value;
+    }
+
+    (function() {
+        /** @type {HTMLFormElement} */
+        const form = document.getElementById("manual-message-form");
+        const targetMessageChannel = form.elements["target-message-channel"];
+        /** @type {HTMLTextAreaElement} */
+        const messageText = form.elements["message-text"];
+        const submit = form.elements["manual-message-submit"];
+
+        console.log(form, targetMessageChannel, messageText, submit);
+
+        showSnackbar(snackbarColors.success, "System initialized successfully.");
+
+        function onSendMessage(e) {
+            e.preventDefault();
+
+            const message = {
+                content: messageText.value,
+            }
+            
+            const channelId = targetMessageChannel.value;
+
+            const dashboardPassword = getDashboardPassword();
+
+            fetch("/api/manual-message", {
+                method: "POST",
+                body: JSON.stringify({ dashboardPassword, message, channelId }),
+            }).then(async r => {
+                if (r.ok) {
+                    showSnackbar(snackbarColors.success, "Message sent successfully.");
+                } else {
+                    showSnackbar(snackbarColors.error, await r.text());
+                }
+            })
+        }
+
+        submit.addEventListener("click", onSendMessage);
+    })();
+</script>
+</body>
+</html>

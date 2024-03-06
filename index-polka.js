@@ -1,8 +1,10 @@
 import polka from "polka";
 import bodyParser from "body-parser";
+import serveStatic from "serve-static";
 import handler from "./api/interactions.js";
 import ddtalkSaveConversation from "./api/ddtalk-save-conversation.js";
 import ddtalkEdge from "./api/ddtalk-edge.js";
+import manualMessage from "./api/manual-message.js";
 import dotenv from "dotenv";
 import { reloadEnv } from "./env.js";
 import handlerBallot from "./api/ballot.js";
@@ -10,9 +12,14 @@ import handlerBallot from "./api/ballot.js";
 dotenv.config();
 reloadEnv();
 
-polka().use(bodyParser.text({
-    type: ["application/json", "text/plain", "text/json"],
-})).post("/api/interactions", /** @type {(req: import("node:http").IncomingMessage, res: import("node:http").ServerResponse) => Promise<void>} */ async (req, res) => {
+polka()
+ .use(
+    bodyParser.text({
+        type: ["application/json", "text/plain", "text/json"],
+    })
+).use(
+    serveStatic("./public")
+).post("/api/interactions", /** @type {(req: import("node:http").IncomingMessage, res: import("node:http").ServerResponse) => Promise<void>} */ async (req, res) => {
     const myRes = {
         status(n) {
             console.log("SET STATUS " + n);
@@ -87,4 +94,19 @@ polka().use(bodyParser.text({
 }).listen(3000, err => {
     if (err) throw err;
     else console.log("Server listening on port 3000.");
-}).post("/api/ballot", handlerBallot);
+}).post("/api/ballot",
+    handlerBallot
+ ).post("/api/manual-message", async (req, res) => {
+    const myReq = {
+        method: "POST",
+        async json() {
+            return req.body;
+        }
+    }
+    req.rawBody = req.body;
+    req.body = JSON.parse(req.body);
+    const response = await manualMessage(myReq);
+    console.log(response);
+    res.statusCode = response.status;
+    res.end(await response.text());
+});
