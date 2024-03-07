@@ -26,8 +26,7 @@ export async function postBallotMessage(channelId, ballotId, message, roster) {
         ...getJSONResponse(message),
     }).then(r => r.json());
 
-    console.log(sentMessage);
-    BallotDB.putBallotMessageId(channelId, ballotId, {id: sentMessage.id, roster});
+    return BallotDB.putBallotMessageId(channelId, ballotId, {id: sentMessage.id, roster});
 }
 
 export async function getNextBallotMessage(channelId, ballotId) {
