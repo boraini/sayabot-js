@@ -22,6 +22,10 @@
             <input id="target-message-channel" name="target-message-channel" type="text" />
         </p>
         <p>
+            <label for="target-message-channel">Replying to: </label>
+            <input id="replying-to" name="replying-to" type="text" />
+        </p>
+        <p>
             <label for="message-text">Message Text</label>
             <textarea id="message-text" name="message-text"></textarea>
         </p>
@@ -62,6 +66,7 @@
         /** @type {HTMLFormElement} */
         const form = document.getElementById("manual-message-form");
         const targetMessageChannel = form.elements["target-message-channel"];
+        const replyingTo = form.elements["replying-to"];
         /** @type {HTMLTextAreaElement} */
         const messageText = form.elements["message-text"];
         const submit = form.elements["manual-message-submit"];
@@ -75,6 +80,9 @@
 
             const message = {
                 content: messageText.value,
+                message_reference: replyingTo.value == "" ? undefined : {
+                    message_id: replyingTo.value,
+                },
             }
             
             const channelId = targetMessageChannel.value;
