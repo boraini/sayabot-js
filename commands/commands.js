@@ -1,6 +1,7 @@
 import ddtest from "./ddtest.js";
 import ddtalk from "./ddtalk.js";
 import ddlung from "./ddlung.js";
+import ddpikmin from "./ddpikmin.js";
 
 export function setCommands(client) {
     client.commands = new Map();
@@ -8,14 +9,16 @@ export function setCommands(client) {
     client.commands.set("ddtest", ddtest);
     client.commands.set("ddtalk", ddtalk);
 	client.commands.set("ddlung", ddlung);
+	client.commands.set("ddpikmin", ddpikmin);
 	// Message commands
-	client.commands.set("ddlung-onmessage", ddlung.onMessage);
+	client.commands.set("Lungify this message", ddlung);
+	client.commands.set("Pikminify this message", ddpikmin);
 }
 
 export async function handleInteraction(client, interaction) {
     try {
 		if (interaction.isMessageContextMenuCommand()) {
-			const command = client.commands.get("ddlung");
+			const command = client.commands.get(interaction.commandName);
 			await command.executeOnMessage(interaction);
 		}
 
