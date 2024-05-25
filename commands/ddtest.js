@@ -5,8 +5,7 @@ const data = new SlashCommandBuilder()
     .setDescription("Responds with \"beep bop\"");
 
 async function execute(interaction) {
-    await interaction.followUp("You like JavaScript, don't you?");
-    await interaction.reply("Whomst've summoned the almighty SayaBot!");
+    await interaction.reply("Whomst've summoned the almighty SayaBot!\n\n> You like JavaScript, don't you?");
 }
 
 export default { data, execute };
