@@ -1,6 +1,7 @@
 import { ContextMenuCommandBuilder, SlashCommandBuilder, ApplicationCommandType } from "discord.js";
 import prepositions from "./prepositions.js";
 import { MAX_MESSAGE_LENGTH, formatShortened } from "./mitigation.js";
+import { visitMessageComponents } from "./util.js";
 
 const data = new SlashCommandBuilder()
     .setName("ddpikmin")
@@ -131,10 +132,13 @@ async function execute(interaction) {
 }
 
 async function executeOnMessage(interaction) {
-    const pikminified = pikminify(interaction.targetMessage.content);
     const displayName = interaction.targetMessage.author.displayName ?? interaction.targetMessage.author.username;
 
-    interaction.reply(formatShortened(contextMenuCommandFormat, MAX_MESSAGE_LENGTH, [displayName, pikminified]));
+    const pikminified = visitMessageComponents(pikminify, interaction.targetMessage);
+
+    pikminified.content = formatShortened(contextMenuCommandFormat, MAX_MESSAGE_LENGTH, [displayName, pikminified.content]);
+
+    interaction.reply(pikminified);
 }
 
-export default { data, onMessage: { data: onMessageData }, execute, executeOnMessage };
+export default { data, onMessage: { data: onMessageData, executeOnMessage }, execute };
