@@ -11,8 +11,8 @@ export function setCommands(client) {
 	client.commands.set("ddlung", ddlung);
 	client.commands.set("ddpikmin", ddpikmin);
 	// Message commands
-	client.commands.set("Lungify this message", ddlung);
-	client.commands.set("Pikminify this message", ddpikmin);
+	client.commands.set("Lungify this message", ddlung.onMessage);
+	client.commands.set("Pikminify this message", ddpikmin.onMessage);
 }
 
 export async function handleInteraction(client, interaction) {
