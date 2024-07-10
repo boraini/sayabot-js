@@ -2,8 +2,11 @@ import { BallotDB } from "./ballot-database-vercel-kv.js";
 import { baseDiscordApiUrl, getJSONResponse } from "../commands/webhook-endpoints.js";
 import env from "../env.js";
 import { getChannelMembers } from "./ballot-channel.js";
+import { sampleWithoutReplacement } from "./util.js";
 
 const emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
+
+/** @typedef {{version: number, count: number, resultFormat: string, pollFormat: string, optOut?: string[], optIn?: string[]}} BallotInfo */
 
 export async function getBallotMessage(channelId, ballotId) {
     await BallotDB.connect();
@@ -32,22 +35,24 @@ export async function postBallotMessage(channelId, ballotId, message, roster) {
 export async function getNextBallotMessage(channelId, ballotId) {
     await BallotDB.connect();
 
-    const ballotInfo = await BallotDB.getBallotInfo(channelId, ballotId);
+    /** @type {BallotInfo} */
+    const ballotInfo = await BallotDB.getBallotInfo(channelId, ballotId) ?? BallotDB.getDummyBallotInfo();
     const channelMembers = await getChannelMembers(channelId);
     const [ballotMessage, roster] = await getBallotMessage(channelId, ballotId);
-
-    console.log(ballotMessage, roster);
 
     let leadingText = "";
     
     if (ballotMessage && ballotMessage.reactions) {
         let currentMaxVotes = 0;
         let currentMaxIndex = -1;
+
+        const allVotes = [];
         
         for (let i = 0; i < ballotInfo.count; i++) {
             const emoji = emojis[i];
             const reaction = ballotMessage.reactions.find(r => r.emoji.name == emoji);
             const votes = reaction?.count ?? 0;
+            allVotes.push(votes);
             if (currentMaxVotes < votes) {
                 currentMaxVotes = votes;
                 currentMaxIndex = i;
@@ -55,18 +60,38 @@ export async function getNextBallotMessage(channelId, ballotId) {
         }
 
         if (currentMaxIndex != -1) {
-            const winnerId = roster[currentMaxIndex];
+            const winnerIds = [];
+            for (let i = 0; i < ballotInfo.count; i++) {
+                if (allVotes[i] >= currentMaxVotes) {
+                    winnerIds.push(roster[i]);
+                }
+            }
 
-            leadingText = ballotInfo.resultFormat.replaceAll("{WINNER}", `<@${winnerId}>`).replaceAll("{COUNT}", ballotInfo.count) + "\n";
+            const isAre = winnerIds.length == 1 ? "is" : "are";
+
+            leadingText = ballotInfo.resultFormat
+                .replaceAll("{WINNER}", winnerIds.map(winnerId => `<@${winnerId}>`).join(", "))
+                .replaceAll("{COUNT}", ballotInfo.count)
+                .replaceAll("{IS/ARE}", isAre) + "\n";
         }
     }
 
     const ballotText = ballotInfo.pollFormat.replaceAll("{COUNT}", ballotInfo.count);
+    
+    let eligibleMembers = channelMembers;
 
-    const drawCount = Math.min(ballotInfo.count, channelMembers.length);
+    if (ballotInfo.optOut) {
+        eligibleMembers = eligibleMembers.filter(u => u.roles && ballotInfo.optOut.every(r => !u.roles.includes(r)));
+    }
+
+    if (ballotInfo.optIn) {
+        eligibleMembers = eligibleMembers.filter(u => u.roles && ballotInfo.optIn.some(r => u.roles.includes(r)));
+    }
+
+    const drawCount = Math.min(ballotInfo.count, eligibleMembers.length);
 
     /** @type {string[]} */
-    const candidates = drawCount == channelMembers.length ? channelMembers.map(m => m.user.id) : channelMembers.sort(() => 0.5 - Math.random()).slice(0, drawCount).map(m => m.user.id);
+    let candidates = drawCount == eligibleMembers.length ? eligibleMembers.map(m => m.user.id) : sampleWithoutReplacement(eligibleMembers, drawCount).map(m => m.user.id);
 
     const pollListText = candidates.map((id, i) => "- " + emojis[i] + ": " + `<@${id}>`).join("\n");
 

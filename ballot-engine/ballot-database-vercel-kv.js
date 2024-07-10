@@ -25,9 +25,10 @@ export const BallotDB = {
         return kv.set(`ballot_message_id:${channelId}:${ballotId}`, messageId);
     },
 
-    async getBallotInfo(channelId, ballotId) {
+    async getDummyBallotInfo() {
         return {
-            resultFormat: "Today is Thursday, which is time for me to announce that {WINNER} is the gayest of all!",
+            version: 0,
+            resultFormat: "Today is Thursday, which is time for me to announce that {WINNER} {IS/ARE} the gayest of all!",
             pollFormat: "For the next week, vote for the gayest among the {COUNT} below.",
             count: 3,
             optOut: [],
