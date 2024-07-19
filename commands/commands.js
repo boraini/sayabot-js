@@ -2,6 +2,7 @@ import ddtest from "./ddtest.js";
 import ddtalk from "./ddtalk.js";
 import ddlung from "./ddlung.js";
 import ddpikmin from "./ddpikmin.js";
+import breadman from "./breadman.js";
 
 export function setCommands(client) {
     client.commands = new Map();
@@ -13,6 +14,7 @@ export function setCommands(client) {
 	// Message commands
 	client.commands.set("Lungify this message", ddlung.onMessage);
 	client.commands.set("Pikminify this message", ddpikmin.onMessage);
+	client.commands.set("What does Breadman say?", breadman.onMessage);
 }
 
 export async function handleInteraction(client, interaction) {
