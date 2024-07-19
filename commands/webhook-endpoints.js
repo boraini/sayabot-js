@@ -27,7 +27,7 @@ export function interactionResponseFollowupEndpoint(interaction) {
 export function getInteractionResponse(type, message, options) {
     return {
         type: type,
-        data: message instanceof String ? getMessage(message, options) : message,
+        data: (typeof message == "string" || message instanceof String) ? getMessage(message, options) : message,
     };
 }
 
