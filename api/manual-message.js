@@ -44,9 +44,9 @@ export default async function handler(req, res) {
             if (webhookInfo == null) {
                 throw new Error("Failed to get/create webhook. Try sending a message without the personality.");
             }
-            response = sendWebhookMessage(webhookInfo, message, webhookData);
+            await sendWebhookMessage(webhookInfo, message, webhookData);
         } else {
-            response = fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages`, {
+            await fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages`, {
                 method: "POST",
                 ...getJSONResponse(message),
             });
