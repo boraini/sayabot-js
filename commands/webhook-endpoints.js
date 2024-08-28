@@ -50,10 +50,18 @@ export async function editReply(interaction, message, options) {
 export async function sendWebhookMessage(webhook, message, webhookData) {
     const endpoint = `${baseDiscordApiUrl}/webhooks/${webhook.id}/${webhook.token}`;
 
+    let message_reference = undefined, content = message;
+
+    if (content.content) {
+        content = content.content;
+        message_reference = content.message_reference;
+    }
+    
     return fetch(endpoint, {
         method: "POST",
         ...getJSONResponse({
-            content: message,
+            content,
+            message_reference,
             username: webhookData.displayName,
             avatar_url: webhookData.avatar,
         }),

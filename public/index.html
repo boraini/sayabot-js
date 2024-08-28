@@ -147,7 +147,7 @@
                     avatar_url = urlPrefix + avatar_url;
                 }
 
-                return { name, avatar_url };
+                return { displayName: name, avatar: avatar_url };
             }();
 
             const dashboardPassword = getDashboardPassword();

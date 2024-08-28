@@ -31,7 +31,6 @@ export default async function handler(req, res) {
         let response;
 
         if (webhookData) {
-            console.log(webhookData);
             if (webhookData.avatar_url && !webhookData.avatar_url.startsWith("http")) {
                 throw new Error("avatar_url needs to be an absolute URL with protocol.");
             }
@@ -44,15 +43,22 @@ export default async function handler(req, res) {
             if (webhookInfo == null) {
                 throw new Error("Failed to get/create webhook. Try sending a message without the personality.");
             }
-            await sendWebhookMessage(webhookInfo, message, webhookData);
+            
+            response = await sendWebhookMessage(webhookInfo, message, webhookData);
         } else {
-            await fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages`, {
+            response = await fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages`, {
                 method: "POST",
                 ...getJSONResponse(message),
             });
         }
 
-        res.send("OK");
+        if (response.ok) {
+            res.send("OK");
+        } else {
+            throw new Error(`Message failed to send with status ${response.statusText}: ${await response.text()}`);
+        }
+
+        
     } catch (e) {
         res.statusCode = 502;
         res.send("Message sending failed with exception: " + e.message);
