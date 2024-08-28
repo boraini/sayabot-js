@@ -2,8 +2,13 @@ import { baseDiscordApiUrl, getJSONResponse, sendWebhookMessage } from "../comma
 import { connectDb } from "../database/mongodb.js";
 import env from "../env.js";
 
-export default async function POST(req) {
-    const requestJSON = await req.json();
+/**
+ * @param {import("@vercel/node").VercelRequest} req 
+ * @param {import("@vercel/node").VercelResponse} res 
+ * @returns 
+ */
+export default async function handler(req, res) {
+    const requestJSON = req.body;
     const { dashboardPassword, channelId, message, webhookData } = requestJSON;
 
     try {
@@ -41,14 +46,15 @@ export default async function POST(req) {
             }
             response = sendWebhookMessage(webhookInfo, message, webhookData);
         } else {
-            response = await fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages`, {
+            response = fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages`, {
                 method: "POST",
                 ...getJSONResponse(message),
             });
         }
-        
-        return response;
+
+        res.send("OK");
     } catch (e) {
-        return new Response("Message sending failed with exception: " + e.message, { status: 502 });
+        res.statusCode = 502;
+        res.send("Message sending failed with exception: " + e.message);
     }
 }
