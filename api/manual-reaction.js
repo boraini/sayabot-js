@@ -1,10 +1,6 @@
 import { baseDiscordApiUrl, getJSONResponse } from "../commands/webhook-endpoints.js";
 import env from "../env.js";
 
-export const config = {
-    runtime: "edge",
-};
-
 export default async function handle(req) {
     const requestJSON = await req.json();
     const { dashboardPassword, channelId, messageId, emoji, method } = requestJSON;
