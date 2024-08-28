@@ -100,16 +100,32 @@ polka()
  ).post("/api/manual-message", async (req, res) => {
     const myReq = {
         method: "POST",
+        rawBody: req.body,
+        body: JSON.parse(req.body),
+        statusCode: 200,
         async json() {
             return req.body;
         }
     }
-    req.rawBody = req.body;
-    req.body = JSON.parse(req.body);
-    const response = await manualMessage(myReq);
-    console.log(response);
-    res.statusCode = response.status;
-    res.end(await response.text());
+    const myRes = {
+        status(n) {
+            console.log("SET STATUS " + n);
+            res.statusCode = n;
+        },
+        send(str) {
+            console.log("RES END ", str);
+            res.end(str);
+        },
+        json(obj) {
+            console.log(obj);
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify(obj));
+        },
+        setHeader(k, v) {
+            res.setHeader(k, v);
+        },
+    }
+    manualMessage(myReq, myRes);
 }).post("/api/manual-reaction", async (req, res) => {
     const myReq = {
         method: "POST",

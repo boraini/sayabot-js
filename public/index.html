@@ -34,7 +34,7 @@
             <textarea id="message-text" name="message-text"></textarea>
         </p>
         <p id="personality-selections">
-            <input type="radio" data-image="personality-images/seya-wolf.png" name="personality-selection" value="Bot Itself" checked />
+            <input type="radio" data-image="personality-images/seya-wolf.png" data-nowebhook="true" name="personality-selection" value="Bot Itself" checked />
             <input type="radio" data-image="personality-images/serial-designation-n.jpg" name="personality-selection" value="Serial-Designation N" />
             <input type="radio" data-image="personality-images/glitchcore-mitsuba.jpg" name="personality-selection" value="Glitchcore Mitsuba" />
         </p>
@@ -127,6 +127,10 @@
                 const personalitySelection = document.querySelector('input[name="personality-selection"]:checked');
 
                 if (!personalitySelection) {
+                    return undefined;
+                }
+
+                if (personalitySelection.dataset.nowebhook) {
                     return undefined;
                 }
 
