@@ -1,17 +1,21 @@
 import { ContextMenuCommandBuilder, SlashCommandBuilder, ApplicationCommandType } from "discord.js";
 import prepositions from "./prepositions.js";
 import { MAX_MESSAGE_LENGTH, formatShortened } from "./mitigation.js";
-import { visitMessageComponents } from "./util.js";
+import { IntegrationTypes, InteractionContextTypes, visitMessageComponents } from "./util.js";
 
 const data = new SlashCommandBuilder()
     .setName("ddlung")
     .setDescription("Lungify your message")
-    .addStringOption(option => option.setName("message").setDescription("The message you want to lungify").setRequired(true));
+    .addStringOption(option => option.setName("message").setDescription("The message you want to lungify").setRequired(true))
+    .setIntegrationTypes([IntegrationTypes.GUILD_INSTALL, IntegrationTypes.USER_INSTALL])
+    .setContexts(InteractionContextTypes.all)
 
 const onMessageData = new ContextMenuCommandBuilder()
     .setName("Lungify this message") 
-    .setType(ApplicationCommandType.Message);
-    
+    .setType(ApplicationCommandType.Message)
+    .setIntegrationTypes([IntegrationTypes.GUILD_INSTALL, IntegrationTypes.USER_INSTALL])
+    .setContexts(InteractionContextTypes.all)
+ 
 const unlunged = [
     "i", "you", "they", "he", "she", "it", "we",
     "me", "your", "them", "him", "her", "us",

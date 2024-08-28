@@ -1,5 +1,5 @@
 import { BallotDB } from "./ballot-database-vercel-kv.js";
-import { baseDiscordApiUrl, getJSONResponse } from "../commands/webhook-endpoints.js";
+import { baseDiscordApiUrl, getJSONResponse, sendAllReactions } from "../commands/webhook-endpoints.js";
 import env from "../env.js";
 import { getChannelMembers } from "./ballot-channel.js";
 import { sampleWithoutReplacement } from "./util.js";
@@ -29,14 +29,17 @@ export async function postBallotMessage(channelId, ballotId, message, roster) {
         ...getJSONResponse(message),
     }).then(r => r.json());
 
-    return BallotDB.putBallotMessageId(channelId, ballotId, {id: sentMessage.id, roster});
+    await BallotDB.putBallotMessageId(channelId, ballotId, {id: sentMessage.id, roster});
+
+    return sentMessage;
 }
 
 export async function getNextBallotMessage(channelId, ballotId) {
     await BallotDB.connect();
 
     /** @type {BallotInfo} */
-    const ballotInfo = await BallotDB.getBallotInfo(channelId, ballotId) ?? BallotDB.getDummyBallotInfo();
+    const ballotInfo = await BallotDB.getBallotInfo(channelId, ballotId) ?? await BallotDB.getDummyBallotInfo();
+
     const channelMembers = await getChannelMembers(channelId);
     const [ballotMessage, roster] = await getBallotMessage(channelId, ballotId);
 
@@ -99,4 +102,8 @@ export async function getNextBallotMessage(channelId, ballotId) {
         content: leadingText + ballotText + "\n" + pollListText,
         reactions: emojis.slice(0, drawCount).map(e => ({ emoji: {name: e}, count: 1 })),
     }, candidates];
+}
+
+export async function addBallotReactions(channelId, messageId, drawCount) {
+    return sendAllReactions(channelId, messageId, emojis.slice(0, drawCount), 500);
 }

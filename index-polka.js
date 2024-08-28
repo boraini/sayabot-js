@@ -5,6 +5,7 @@ import handler from "./api/interactions.js";
 import ddtalkSaveConversation from "./api/ddtalk-save-conversation.js";
 import ddtalkEdge from "./api/ddtalk-edge.js";
 import manualMessage from "./api/manual-message.js";
+import manualReaction from "./api/manual-reaction.js";
 import dotenv from "dotenv";
 import { reloadEnv } from "./env.js";
 import handlerBallot from "./api/ballot.js";
@@ -106,6 +107,19 @@ polka()
     req.rawBody = req.body;
     req.body = JSON.parse(req.body);
     const response = await manualMessage(myReq);
+    console.log(response);
+    res.statusCode = response.status;
+    res.end(await response.text());
+}).post("/api/manual-reaction", async (req, res) => {
+    const myReq = {
+        method: "POST",
+        async json() {
+            return req.body;
+        }
+    }
+    req.rawBody = req.body;
+    req.body = JSON.parse(req.body);
+    const response = await manualReaction(myReq);
     console.log(response);
     res.statusCode = response.status;
     res.end(await response.text());

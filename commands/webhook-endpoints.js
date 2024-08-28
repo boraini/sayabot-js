@@ -68,3 +68,25 @@ export async function deferReplyWebhook(interaction) {
         method: "POST",
     }).then(r => r.text(), () => console.log("there was an error creating the response")).then(r => console.log(r));
 }
+
+export async function sendAllReactions(channelId, messageId, emojis, delay) {
+    const myEmojis = [...emojis];
+
+    async function resolver(resolve) {
+        const emoji = myEmojis.shift();
+        const encoded = encodeURIComponent(emoji);
+
+        await fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages/${messageId}/reactions/${encoded}/@me`, {
+            method: "PUT",
+            ...getJSONResponse({}),
+        });
+
+        if (myEmojis.length == 0) {
+            resolve();
+        } else {
+            setTimeout(() => resolver(resolve), delay);
+        }
+    }
+
+    return new Promise(resolver);
+}

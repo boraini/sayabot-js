@@ -1,4 +1,5 @@
-import { baseDiscordApiUrl, getJSONResponse } from "../commands/webhook-endpoints.js";
+import { baseDiscordApiUrl, getJSONResponse, sendWebhookMessage } from "../commands/webhook-endpoints.js";
+import { connectDb } from "../database/mongodb.js";
 import env from "../env.js";
 
 export const config = {
@@ -7,7 +8,7 @@ export const config = {
 
 export default async function handle(req) {
     const requestJSON = await req.json();
-    const { dashboardPassword, channelId, message } = requestJSON;
+    const { dashboardPassword, channelId, message, webhookData } = requestJSON;
 
     try {
         if (env.dashboardPassword != dashboardPassword) {
@@ -26,10 +27,29 @@ export default async function handle(req) {
             throw new Error("Message is too long or not in valid format.");
         }
 
-        const response = await fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages`, {
-            method: "POST",
-            ...getJSONResponse(message),
-        });
+        let response;
+
+        if (webhookData) {
+            console.log(webhookData);
+            if (webhookData.avatar_url && !webhookData.avatar_url.startsWith("http")) {
+                throw new Error("avatar_url needs to be an absolute URL with protocol.");
+            }
+
+            const WebhookService = (await import("../webhooks/webhook-service.js")).WebhookService;
+
+            await connectDb();
+            const webhookInfo = await WebhookService.getChannelClientInfo({ id: channelId });
+
+            if (webhookInfo == null) {
+                throw new Error("Failed to get/create webhook. Try sending a message without the personality.");
+            }
+            response = sendWebhookMessage(webhookInfo, message, webhookData);
+        } else {
+            response = await fetch(`${baseDiscordApiUrl}/channels/${channelId}/messages`, {
+                method: "POST",
+                ...getJSONResponse(message),
+            });
+        }
         
         return response;
     } catch (e) {

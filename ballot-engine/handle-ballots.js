@@ -1,5 +1,5 @@
 import { BallotDB } from "./ballot-database-vercel-kv.js";
-import { getNextBallotMessage, postBallotMessage } from "./ballot-message.js";
+import { getNextBallotMessage, postBallotMessage, addBallotReactions } from "./ballot-message.js";
 
 export async function handleBallots() {
     await BallotDB.connect();
@@ -10,5 +10,6 @@ export async function handleBallots() {
 
 export async function handleBallot(channelId, ballotId) {
     const [message, roster] = await getNextBallotMessage(channelId, ballotId);
-    return postBallotMessage(channelId, ballotId, message, roster);
+    const sentMessage = await postBallotMessage(channelId, ballotId, message, roster);
+    return addBallotReactions(channelId, sentMessage.id, roster.length);
 }

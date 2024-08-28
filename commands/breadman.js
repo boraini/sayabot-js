@@ -1,8 +1,11 @@
 import { ContextMenuCommandBuilder, ApplicationCommandType } from "discord.js";
+import { IntegrationTypes, InteractionContextTypes } from "./util.js";
 
 const onMessageData = new ContextMenuCommandBuilder()
     .setName("What does Breadman say?")
-    .setType(ApplicationCommandType.Message);
+    .setType(ApplicationCommandType.Message)
+    .setIntegrationTypes([IntegrationTypes.GUILD_INSTALL, IntegrationTypes.USER_INSTALL])
+    .setContexts(InteractionContextTypes.all)
 
 function result(symbols, parsed, rest) {
     const value = { ok: true, parsed, rest, capture(fn) {fn(parsed); return value;}, then(fn) {return fn(symbols, rest)} };

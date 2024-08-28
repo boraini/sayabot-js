@@ -30,3 +30,38 @@
     background-color: #dd22aa;
     color: white;
 }
+
+.personality-selection {
+    display: inline-block;
+    background-color: lightgray;
+    margin: 0.4em;
+    border: 1px solid black;
+    border-radius: 1em;
+    padding: 0.8em;
+}
+
+.personality-selection:has(input:checked) {
+    background-color: #44ff88;
+    color: black;
+}
+
+.personality-selection input, .emoji-selection input {
+    display: none;
+}
+
+.personality-selection img {
+    width: 2em;
+    height: 2em;
+    margin-right: 0.4em;
+    border-radius: 50% 50%;
+    vertical-align: middle;
+}
+
+#emoji-selections {
+    margin: auto;
+    max-width: 1000px;
+}
+
+.emoji-selection:has(input:checked) {
+    border: 1px solid red;
+}
