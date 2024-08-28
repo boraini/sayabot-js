@@ -1,7 +1,7 @@
 import { baseDiscordApiUrl, getJSONResponse } from "../commands/webhook-endpoints.js";
 import env from "../env.js";
 
-export default async function handle(req) {
+export default async function POST(req) {
     const requestJSON = await req.json();
     const { dashboardPassword, channelId, messageId, emoji, method } = requestJSON;
 

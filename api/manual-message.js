@@ -2,7 +2,7 @@ import { baseDiscordApiUrl, getJSONResponse, sendWebhookMessage } from "../comma
 import { connectDb } from "../database/mongodb.js";
 import env from "../env.js";
 
-export default async function handle(req) {
+export default async function POST(req) {
     const requestJSON = await req.json();
     const { dashboardPassword, channelId, message, webhookData } = requestJSON;
 
