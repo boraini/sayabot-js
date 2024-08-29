@@ -33,10 +33,20 @@
             <label for="message-text">Message Text</label>
             <textarea id="message-text" name="message-text"></textarea>
         </p>
+        <p id="personality-selections">
+            <input type="radio" data-image="personality-images/seya-wolf.png" data-nowebhook="true" name="personality-selection" value="Bot Itself" checked />
+            <input type="radio" data-image="personality-images/serial-designation-n.jpg" name="personality-selection" value="Serial-Designation N" />
+            <input type="radio" data-image="personality-images/glitchcore-mitsuba.jpg" name="personality-selection" value="Glitchcore Mitsuba" />
+        </p>
         <p>
             <button id="manual-message-submit">Submit!</button>
         </p>
-    </form> 
+        <p id="emoji-selections"></p>
+        <p>
+            <button id="manual-reaction-add">Add Reaction!</button>
+            <button id="manual-reaction-remove">Remove Reaction!</button>
+        </p>
+    </form>
     <p id="snackbar" class="snackbar"></p>
 </div>
 
@@ -46,6 +56,8 @@
         success: "bg-success",
         error: "bg-error",
     };
+
+    const emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🫁", "😂", "❤️", "🤣", "👍", "😭", "🙏", "😘", "🥰", "😍", "😊", "🎉", "😁", "💕", "🥺", "😅", "🔥", "☺️", "🤦", "♥️", "🤷", "🙄", "😆", "🤗", "😉", "🎂", "🤔", "👏", "🙂", "😳", "🥳", "😎", "👌", "💜", "😔", "💪", "✨", "💖", "👀", "😋", "😏", "😢", "👉", "💗", "😩", "💯", "🌹", "💞", "🎈", "💙", "😃", "😡", "💐", "😜", "🙈", "🤞", "😄", "🤤", "🙌", "🤪", "❣️", "😀", "💋", "💀", "👇", "💔", "😌", "💓", "🤩", "🙃", "😬", "😱", "😴", "🤭", "😐", "🌞", "😒", "😇", "🌸", "😈", "🎶", "✌️", "🎊", "🥵", "😞", "💚", "☀️", "🖤", "💰", "😚", "👑", "🎁", "💥", "🙋", "☹️", "😑", "🥴", "👈", "💩", "✅", "👋", "🤮", "😤", "🤢", "🌟", "❗", "😥", "🌈", "💛", "😝", "😫", "😲", "🖕", "‼️", "🔴", "🌻", "🤯", "💃", "👊", "🤬", "🏃", "😕", "👁️", "⚡", "☕", "🍀", "💦", "⭐", "🦋", "🤨", "🌺", "😹", "🤘", "🌷", "💝", "💤", "🤝", "🐰", "😓", "💘", "🍻", "😟", "😣", "🧐", "😠", "🤠", "😻", "🌙", "😛", "🤙", "🙊"]
 
     function showSnackbar(colorClass, message) {
         snackbar.classList.remove("active");
@@ -65,6 +77,26 @@
     function getDashboardPassword() {
         return authenticationForm.elements["dashboard-password"].value;
     }
+
+    (function() {
+        const container = document.getElementById("personality-selections");
+
+        for (let element of document.querySelectorAll('input[name="personality-selection"]')) {
+            const parent = document.createElement("label");
+            parent.classList.add("personality-selection");
+            parent.appendChild(element);
+            
+            const image = document.createElement("img");
+            image.alt = element.value;
+            image.src = element.dataset.image;
+            parent.appendChild(image);
+
+            const text = document.createTextNode(element.value);
+            parent.appendChild(text);
+
+            container.appendChild(parent);
+        }
+    })();
 
     (function() {
         /** @type {HTMLFormElement} */
@@ -91,11 +123,38 @@
             
             const channelId = targetMessageChannel.value;
 
+            const webhookData = function() {
+                const personalitySelection = document.querySelector('input[name="personality-selection"]:checked');
+
+                if (!personalitySelection) {
+                    return undefined;
+                }
+
+                if (personalitySelection.dataset.nowebhook) {
+                    return undefined;
+                }
+
+                const name = personalitySelection.value;
+
+                let avatar_url = personalitySelection.dataset.image;
+
+                if (!avatar_url.startsWith("http")) {
+                    let urlPrefix = location.origin + location.pathname;
+                    if (urlPrefix.endsWith("index.html")) urlPrefix.substring(0, urlPrefix.length - "index.html".length);
+                    if (!urlPrefix.endsWith("/")) urlPrefix += "/";
+                    if (avatar_url.startsWith("/")) avatar_url = avatar_url.substring(1);
+
+                    avatar_url = urlPrefix + avatar_url;
+                }
+
+                return { displayName: name, avatar: avatar_url };
+            }();
+
             const dashboardPassword = getDashboardPassword();
 
             fetch("/api/manual-message", {
                 method: "POST",
-                body: JSON.stringify({ dashboardPassword, message, channelId }),
+                body: JSON.stringify({ dashboardPassword, message, channelId, webhookData }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -109,6 +168,66 @@
         }
 
         submit.addEventListener("click", onSendMessage);
+    })();
+
+    (function() {
+        const container = document.getElementById("emoji-selections");
+        const form = document.getElementById("manual-message-form");
+        const targetMessageChannel = form.elements["target-message-channel"];
+        const replyingTo = form.elements["replying-to"];
+
+        const frag = document.createDocumentFragment();
+        for (let emoji of emojis) {
+            const parent = document.createElement("label");
+            parent.classList.add("emoji-selection");
+
+            const input = document.createElement("input");
+            input.name = "emoji-selection";
+            input.type = "radio";
+            input.value = emoji;
+            parent.appendChild(input);
+
+            const text = document.createTextNode(emoji);
+            parent.appendChild(text);
+
+            frag.appendChild(parent);
+        }
+
+        frag.children[0].children[0].checked = true;
+
+        container.appendChild(frag);
+
+        const handler = method => e => {
+            e.preventDefault();
+
+            const emojiSelection = document.querySelector('input[name="emoji-selection"]:checked');
+
+            if (!emojiSelection) return;
+
+            const emoji = encodeURIComponent(emojiSelection.value);
+
+            const channelId = targetMessageChannel.value;
+            const messageId = replyingTo.value;
+
+            const dashboardPassword = getDashboardPassword();
+
+            fetch("/api/manual-reaction", {
+                method: "POST",
+                body: JSON.stringify({ dashboardPassword, messageId, channelId, emoji, method }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then(async r => {
+                if (r.ok) {
+                    showSnackbar(snackbarColors.success, "Reaction changed successfully.");
+                } else {
+                    showSnackbar(snackbarColors.error, await r.text());
+                }
+            })
+        };
+
+        document.getElementById("manual-reaction-add").onclick = handler("PUT");
+        document.getElementById("manual-reaction-remove").onclick = handler("DELETE");
     })();
 </script>
 </body>

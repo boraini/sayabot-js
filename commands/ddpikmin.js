@@ -1,16 +1,20 @@
 import { ContextMenuCommandBuilder, SlashCommandBuilder, ApplicationCommandType } from "discord.js";
 import prepositions from "./prepositions.js";
 import { MAX_MESSAGE_LENGTH, formatShortened } from "./mitigation.js";
-import { visitMessageComponents } from "./util.js";
+import { IntegrationTypes, InteractionContextTypes, visitMessageComponents } from "./util.js";
 
 const data = new SlashCommandBuilder()
     .setName("ddpikmin")
     .setDescription("Pikminify your message")
-    .addStringOption(option => option.setName("message").setDescription("The message you want to pikminify").setRequired(true));
+    .addStringOption(option => option.setName("message").setDescription("The message you want to pikminify").setRequired(true))
+    .setIntegrationTypes([IntegrationTypes.GUILD_INSTALL, IntegrationTypes.USER_INSTALL])
+    .setContexts(InteractionContextTypes.all)
 
 const onMessageData = new ContextMenuCommandBuilder()
     .setName("Pikminify this message")
-    .setType(ApplicationCommandType.Message);
+    .setType(ApplicationCommandType.Message)
+    .setIntegrationTypes([IntegrationTypes.GUILD_INSTALL, IntegrationTypes.USER_INSTALL])
+    .setContexts(InteractionContextTypes.all)
 
 const unchanged = [
     "i", "you", "they", "he", "she", "it", "we",

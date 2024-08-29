@@ -1,4 +1,3 @@
-import { WebhookClient } from "discord.js"
 import { WebhookDatabase } from "../database/webhook-database-mongodb.js";
 import env from "../env.js";
 import { baseDiscordApiUrl, getJSONResponse } from "../commands/webhook-endpoints.js";
@@ -40,10 +39,6 @@ export const WebhookService = {
         }
 
         return info;
-    },
-
-    async getChannelClient(channel) {
-        return WebhookService.getChannelClientInfo(channel).then(info => new WebhookClient(info));
     },
 
     async createWebhook(channel, options) {
