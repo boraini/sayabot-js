@@ -2,6 +2,7 @@ import ddtest from "./ddtest.js";
 import ddtalk from "./ddtalk.js";
 import ddlung from "./ddlung.js";
 import ddpikmin from "./ddpikmin.js";
+import ddscout from "./ddscout.js";
 import breadman from "./breadman.js";
 
 export function setCommands(client) {
@@ -11,9 +12,11 @@ export function setCommands(client) {
     client.commands.set("ddtalk", ddtalk);
 	client.commands.set("ddlung", ddlung);
 	client.commands.set("ddpikmin", ddpikmin);
+	client.commands.set("ddscout", ddscout);
 	// Message commands
 	client.commands.set("Lungify this message", ddlung.onMessage);
 	client.commands.set("Pikminify this message", ddpikmin.onMessage);
+	client.commands.set("Scoutify this message", ddscout.onMessage);
 	client.commands.set("What does Breadman say?", breadman.onMessage);
 }
 
