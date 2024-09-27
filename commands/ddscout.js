@@ -19,7 +19,9 @@ const onMessageData = new ContextMenuCommandBuilder()
 function scoutify(message) {
     return message
         .replaceAll("Ə", "SCOUT")
-        .replaceAll("ə", "scout");
+        .replaceAll("ə", "scout")
+        .replaceAll("E", "SCOUT")
+        .replaceAll("e", "scout");
 }
 
 function chatCommandFormat([input, scoutified]) {
