@@ -1,6 +1,7 @@
 import { ContextMenuCommandBuilder, ApplicationCommandType } from "discord.js";
 import { IntegrationTypes, InteractionContextTypes } from "./util.js";
 import { MAX_MESSAGE_LENGTH } from "./mitigation.js";
+import { deferReplyWebhook } from "./webhook-endpoints.js";
 
 const onMessageData = new ContextMenuCommandBuilder()
     .setName("Make Braille image")
@@ -37,9 +38,10 @@ async function executeOnMessage(interaction) {
 
     if (imageUrl == null) {
         interaction.reply("Only use this command on messages with attached images.", { ephemeral: true });
+        return;
     }
 
-    let err = null;
+    await deferReplyWebhook(interaction);
 
     try {
         const headers = {
@@ -59,10 +61,10 @@ async function executeOnMessage(interaction) {
             }
         });
 
-        interaction.reply(response.substring(0, MAX_MESSAGE_LENGTH), { ephemeral: error });
+        interaction.editReply(response.substring(0, MAX_MESSAGE_LENGTH), { ephemeral: error });
     } catch (e) {
         console.error(e);
-        interaction.reply("An internal error occurred.", { ephemeral: true });
+        interaction.editReply("An internal error occurred.", { ephemeral: true });
     }
 }
 
