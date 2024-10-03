@@ -20,7 +20,7 @@ function getImageUrl(interaction) {
 
     let foundAttachment = null;
 
-    for (let [id, attachment] of message.attachments) {
+    for (let attachment of message.attachments) {
         if (attachment.contentType && recognizedImageTypes.includes(attachment.contentType)) {
             foundAttachment = attachment;
             break;
