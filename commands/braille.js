@@ -21,7 +21,7 @@ function getImageUrl(interaction) {
     let foundAttachment = null;
 
     for (let attachment of message.attachments) {
-        if (attachment.contentType && recognizedImageTypes.includes(attachment.contentType)) {
+        if (attachment.content_type && recognizedImageTypes.includes(attachment.content_type)) {
             foundAttachment = attachment;
             break;
         }
