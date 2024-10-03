@@ -3,7 +3,8 @@ import ddtalk from "./ddtalk.js";
 import ddlung from "./ddlung.js";
 import ddpikmin from "./ddpikmin.js";
 import ddscout from "./ddscout.js";
-import breadman from "./breadman.js";
+// import breadman from "./breadman.js";
+import braille from "./braille.js";
 
 export function setCommands(client) {
     client.commands = new Map();
@@ -17,13 +18,19 @@ export function setCommands(client) {
 	client.commands.set("Lungify this message", ddlung.onMessage);
 	client.commands.set("Pikminify this message", ddpikmin.onMessage);
 	client.commands.set("Scoutify this message", ddscout.onMessage);
-	client.commands.set("What does Breadman say?", breadman.onMessage);
+	// client.commands.set("What does Breadman say?", breadman.onMessage);
+	client.commands.set("Make Braille image", braille.onMessage);
 }
 
 export async function handleInteraction(client, interaction) {
     try {
 		if (interaction.isMessageContextMenuCommand()) {
 			const command = client.commands.get(interaction.commandName);
+
+			if (!command) {
+				throw new Error(`No command matching ${interaction.commandName} was found.`);
+			}
+
 			await command.executeOnMessage(interaction);
 		}
 
