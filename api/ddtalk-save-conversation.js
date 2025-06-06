@@ -1,5 +1,5 @@
+import { connectDb } from "../database/mongodb.js";
 import { CurrentConversationsDatabase } from "../database/conversations-database-mongodb.js";
-import { connectDb, disconnectDb } from "../database/mongodb.js";
 
 /**
  * 

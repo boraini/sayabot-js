@@ -1,8 +1,11 @@
 export const MAX_MESSAGE_LENGTH = 2000;
 
+/**
+ * @typedef {(parts: string[]) => string} Formatter
+ */
 /** Apply a formatter function which takes string parts but shortens the parts as necessary to ensure a max string length.
  * 
- * @param {(parts: string[]) => string} formatter 
+ * @param {Formatter} formatter 
  * @param {number} maxLength 
  * @param {string[]} parts 
  * @returns 

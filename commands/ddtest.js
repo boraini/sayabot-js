@@ -8,4 +8,4 @@ async function execute(interaction) {
     await interaction.reply("Whomst've summoned the almighty SayaBot!\n\n> You like JavaScript, don't you?");
 }
 
-export default { data, execute };
+export default { chat: { data, execute } };

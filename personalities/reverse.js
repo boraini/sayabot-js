@@ -1,12 +1,11 @@
+import webhookPersonalities from "../webhooks/webhook-personalities.js";
+
 const data = {
     nickname: "reverse",
     description: "Reverses the input.",
 };
 
-const webhookData = {
-    username: "sayabotxxxrev",
-    displayName: "Reverse",
-};
+const webhookData = webhookPersonalities["reverse"];
 
 class Conversation {
     constructor(otherName) {

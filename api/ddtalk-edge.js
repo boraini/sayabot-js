@@ -1,7 +1,6 @@
-import { editReply, sendWebhookMessage, getJSONResponse } from "../commands/webhook-endpoints.js";
-import { hydrateConversation } from "../personalities/personalities.js";
-import { getMessageResponse } from "../personality-helpers/standard-response.js";
 import { baseUrl } from "../globals.js";
+import { ddtalkInference } from "../ddtalk/ddtalk-inference.js";
+import { getJSONResponse } from "../commands/webhook-endpoints.js";
 
 /** @type {import("next").PageConfig} */
 export const config = {
@@ -19,39 +18,18 @@ export default async function handler(req, res) {
         return new Response("Method Not Allowed", { status: 405 });
     }
 
-    const { conversationInfo, interactionToken, channelWebhook, otherIdentifier } = await req.json();
-
-    let conversation;
+    const requestItems = await req.json();
 
     try {
-        conversation = hydrateConversation(conversationInfo);
+        const conversation = await ddtalkInference(requestItems);
     } catch (e) {
-        console.error(e);
-        await editReply({ token: interactionToken }, `The conversation data seems to be corrupt. Please consider ending it and start a new one.`);
         return new Response("ERROR");
     }
 
-    let response;
-
-    try {
-        response = await conversation.respond(conversation.lastMessage);
-    } catch (e) {
-        console.error(e);
-        await editReply({ token: interactionToken }, `There is something wrong with ${conversation.myName}. Consider ending this conversation with them and starting a new one.`);
-        return new Response("ERROR");
-    }
-
-    if (channelWebhook) {
-        await editReply({ token: interactionToken }, conversation.lastMessage);
-        await sendWebhookMessage(channelWebhook, response, conversation.webhookData);
-    } else {
-        await editReply({ token: interactionToken }, getMessageResponse(conversation, response));
-    }
-
-    await fetch(`${baseUrl}/api/ddtalk-save-conversation/?uniqueIdentifier=${otherIdentifier.replace("#", "%23")}`, {
+    await fetch(`${baseUrl}/api/ddtalk-save-conversation/?uniqueIdentifier=${requestItems.otherIdentifier.replace("#", "%23")}`, {
         method: "POST",
         ...getJSONResponse(conversation),
     })
 
-    return new Response(response);
+    return new Response(conversation.lastResponse);
 }

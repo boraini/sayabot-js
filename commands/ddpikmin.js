@@ -1,68 +1,9 @@
-import { ContextMenuCommandBuilder, SlashCommandBuilder, ApplicationCommandType } from "discord.js";
-import prepositions from "./prepositions.js";
-import { MAX_MESSAGE_LENGTH, formatShortened } from "./mitigation.js";
-import { IntegrationTypes, InteractionContextTypes, visitMessageComponents } from "./util.js";
-
-const data = new SlashCommandBuilder()
-    .setName("ddpikmin")
-    .setDescription("Pikminify your message")
-    .addStringOption(option => option.setName("message").setDescription("The message you want to pikminify").setRequired(true))
-    .setIntegrationTypes([IntegrationTypes.GUILD_INSTALL, IntegrationTypes.USER_INSTALL])
-    .setContexts(InteractionContextTypes.all)
-
-const onMessageData = new ContextMenuCommandBuilder()
-    .setName("Pikminify this message")
-    .setType(ApplicationCommandType.Message)
-    .setIntegrationTypes([IntegrationTypes.GUILD_INSTALL, IntegrationTypes.USER_INSTALL])
-    .setContexts(InteractionContextTypes.all)
-
-const unchanged = [
-    "i", "you", "they", "he", "she", "it", "we",
-    "me", "your", "them", "him", "her", "us",
-    "my", "his", "their", "our",
-    "mine", "yours", "hers", "theirs", "ours",
-    "who", "what", "when", "where", "which", "whom", "whose",
-    "has", "had", "have",
-    "am", "is", "are", "been", "be", "let's", "lets",
-    "apple", "banana",
-    "the", "a", "an", "some", "these", "those", "that",
-    "very", "much", "many",
-    "will", "would", "must", "can", "could", "shall", "should",
-    "may", "this", "there", "so",
-    ...prepositions
-];
-
-
-const punct = ['[', '!', '"', '#', '$',   // since javascript does not
-    '%', '&', '\'', '(', ')',  // support POSIX character
-    '*', '+', ',', '\\', '-',  // classes, we'll need our
-    '.', '/', ':', ';', '<',   // own version of [:punct:]
-    '=', '>', '?', '@', '[' +
-    ']', '^', '_', '`', '{' +
-    '|', '}', '~', ']'];
-
-const re = new RegExp(     // tokenizer
-    '\\h*' +            // discard possible leading whitespace
-    '(' +               // start capture group
-    '\\.{3}' +            // ellipsis (must appear before punct)
-    '|' +               // alternator
-    '\\w+\\-\\w+' +       // hyphenated words (must appear before punct)
-    '|' +               // alternator
-    '\\w+\'(?:\\w+)?' +   // compound words (must appear before punct)
-    '|' +               // alternator
-    '\\w+' +              // other words
-    '|' +               // alternator
-    '[' + punct.map(p => "\\" + p).join() + ']' +        // punct
-    ')'                // end capture group
-);
+import { textProcessingCommand, punct, unchanged } from "./text-processing.js";
 
 const wordOffset = 3;
 
-/** Implemented by Stroopwafel ;D */
-function pikminify(input) {
+function pikminify(token) {
     /** @type {string[]} */
-    const token = input.split(re);
-
     let s = "";
 
     for (let i = 0; i < token.length; i++) {
@@ -120,29 +61,19 @@ function chatCommandFormat([input, lungified]) {
     > ${lungified}`;
 }
 
-function contextMenuCommandFormat([displayName, lungified]) {
+function onMessageFormat([displayName, lungified]) {
     return `${displayName} had been pikminified!
 
     > ${lungified}
     `;
 }
 
-async function execute(interaction) {
-    const input = interaction.options.get("message").value;
-
-    const pikminified = pikminify(input);
-
-    interaction.reply(formatShortened(chatCommandFormat, MAX_MESSAGE_LENGTH, [input, pikminified]));
-}
-
-async function executeOnMessage(interaction) {
-    const displayName = interaction.targetMessage.author.displayName ?? interaction.targetMessage.author.username;
-
-    const pikminified = visitMessageComponents(pikminify, interaction.targetMessage);
-
-    pikminified.content = formatShortened(contextMenuCommandFormat, MAX_MESSAGE_LENGTH, [displayName, pikminified.content]);
-
-    interaction.reply(pikminified);
-}
-
-export default { data, onMessage: { data: onMessageData, executeOnMessage }, execute };
+export default textProcessingCommand({
+    processor: pikminify,
+    chatCommandName: "ddpikmin",
+    chatCommandDescription: "Pikminify your message",
+    chatCommandArgDescription: "The message you want to pikminify",
+    chatCommandFormat,
+    onMessageName: "Pikminify this message",
+    onMessageFormat,
+});
