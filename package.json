@@ -11,11 +11,11 @@
   "dependencies": {
     "@huggingface/inference": "^2.6.4",
     "@vercel/kv": "^1.0.1",
-    "@vercel/node": "^3.0.19",
+    "@vercel/node": "^3.0.1",
     "axios": "^1.6.3",
     "body-parser": "^1.20.2",
     "discord-interactions": "^3.4.0",
-    "discord.js": "^14.15.3",
+    "discord.js": "^14.14.1",
     "micro": "^10.0.1",
     "mongodb": "^6.3.0",
     "ngrok": "^5.0.0-beta.2",
@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
-    "next": "^14.1.0",
-    "vercel": "^33.0.2"
+    "next": "^15.3.3",
+    "vercel": "^42.3.0"
   }
 }

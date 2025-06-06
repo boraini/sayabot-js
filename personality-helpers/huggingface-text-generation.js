@@ -31,11 +31,10 @@ export class HuggingFaceTextGenerationConversation {
         const scope = this;
         this.lastMessage = message;
 
-        console.log("responding");
-
         scope.conversation.push(message);
 
         const inputConversation = scope.conversation.join("\n");
+        
         const conversationOutput = await textGeneration({
             accessToken: env.huggingfaceToken,
             model: scope.model,
@@ -55,9 +54,8 @@ export class HuggingFaceTextGenerationConversation {
         })();
 
         scope.conversation.push(response);
+        this.lastResponse = response;
         while (scope.conversation.length > CONVERSATION_LENGTH_LIMIT) scope.conversation.shift();
-
-        console.log("responded");
 
         return response;
     }
@@ -68,6 +66,7 @@ export class HuggingFaceTextGenerationConversation {
         const conversation = new HuggingFaceTextGenerationConversation(obj.myName, obj.otherName, obj.model, obj.strip);
         conversation.conversation = obj.conversation;
         conversation.lastMessage = obj.lastMessage;
+        conversation.lastResponse = obj.lastResponse;
 
         return conversation;
     }

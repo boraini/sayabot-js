@@ -79,6 +79,25 @@ function setContexts(contexts) {
     return this;
 }
 
+/**Get button id for use in command.
+ * 
+ * @param {string} commandName
+ * @param {string} payload
+ * 
+ * @return the button id
+ */
+function getButtonId(commandName, payload) {
+    return commandName + "." + payload;
+}
+
+/**Get command name and payload from button id
+ * 
+ * @param {string}
+ */
+function parseButtonId(id) {
+
+}
+
 SlashCommandBuilder.prototype.setIntegrationTypes = setIntegrationTypes;
 SlashCommandBuilder.prototype.setContexts = setContexts;
 

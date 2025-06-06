@@ -36,6 +36,7 @@ export default async function handler(req, res) {
             break;
         case InteractionType.APPLICATION_COMMAND:
         case InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE:
+        case InteractionType.MESSAGE_COMPONENT:
             const response = await handleInteractionAsync(interaction);
             if (response.headers) {
                 for (let [header, value] of Object.entries(response.headers)) {

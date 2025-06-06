@@ -8,6 +8,8 @@ import dotenv from "dotenv";
 dotenv.config();
 reloadEnv();
 
+process.env["GATEWAY"] = "1";
+
 function getClient() {
     const client = new Client({
         intents: [
@@ -37,7 +39,7 @@ if (process.argv.some(s => s == "nodiscord")) {
     setCommands(client);
     const ddtalk = client.commands.get("ddtalk");
 
-    const readLineInterface = ReadLine.createInterface({ input: process.stdin, output: process.stdout });
+    const readLineInterface = (await import("node:readline/promises")).createInterface({ input: process.stdin, output: process.stdout });
     const interactionDummy = {
         options: new Map(),
         user: {

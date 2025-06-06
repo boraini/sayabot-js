@@ -59,4 +59,4 @@ async function executeOnMessage(interaction) {
     interaction.reply(scoutified);
 }
 
-export default { data, onMessage: { data: onMessageData, executeOnMessage }, execute };
+export default { chat: { data, execute }, onMessage: { data: onMessageData, execute: executeOnMessage } };
