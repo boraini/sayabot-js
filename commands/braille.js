@@ -68,4 +68,4 @@ async function executeOnMessage(interaction) {
     }
 }
 
-export default { onMessage: { data: onMessageData, executeOnMessage } };
+export default { onMessage: { data: onMessageData, execute: executeOnMessage } };
