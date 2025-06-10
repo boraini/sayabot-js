@@ -34,7 +34,7 @@ function lungify(token) {
     return s;
 }
 
-function chatCommandFormat([input, lungified]) {
+function chatFormat([input, lungified]) {
     return `Your message:
     
     > ${input}
@@ -56,7 +56,7 @@ export default textProcessingCommand({
     chatCommandName: "ddlung",
     chatCommandDescription: "Lungify your message",
     chatCommandArgDescription: "The message you want to lungify",
-    chatCommandFormat,
+    chatFormat,
     onMessageName: "Lungify this message",
     onMessageFormat,
 });

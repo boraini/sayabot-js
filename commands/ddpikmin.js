@@ -51,7 +51,7 @@ function pikminify(token) {
     return s;
 }
 
-function chatCommandFormat([input, lungified]) {
+function chatFormat([input, lungified]) {
     return `Your message:
     
     > ${input}
@@ -73,7 +73,7 @@ export default textProcessingCommand({
     chatCommandName: "ddpikmin",
     chatCommandDescription: "Pikminify your message",
     chatCommandArgDescription: "The message you want to pikminify",
-    chatCommandFormat,
+    chatFormat,
     onMessageName: "Pikminify this message",
     onMessageFormat,
 });
